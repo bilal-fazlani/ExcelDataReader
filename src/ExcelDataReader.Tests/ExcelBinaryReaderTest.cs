@@ -658,7 +658,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         // - Non-standard header with size=6, and version=0
         // - Mixes record identifiers from different BIFF versions:
         // - Uses NUMBER (BIFF3-8) and NUMBER_OLD (BIFF2) records
-        // - Uses LABEL (BIFF3-5) and LABEL_OLD (BIFF2) records
+        // - Uses LABEL (BIFF3-5) and LABEL_V2 (BIFF2) records
         // - Uses RK (BIFF3-5) and INTEGER (BIFF2) records
         // - Uses FORMAT_V23 (BIFF2-3) and FORMAT (BIFF4-8) records
         using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_368_header.xls"));
@@ -1091,6 +1091,42 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         });
         Assert.That(reader.ActiveSheet, Is.EqualTo(0));
         Assert.That(dataSet.Tables[0].TableName, Is.EqualTo("List1"));
+    }
+
+    [Test]
+    public void Read_XlsExcel20()
+    {
+        using var stream = Configuration.GetTestWorkbook(Path.Combine("xls", "SIMPLE.XLS"));
+        using var reader = OpenReader(stream);
+
+        reader.Read();
+        Assert.That(reader.GetString(0), Is.EqualTo("Value_A1"));
+        Assert.That(reader.GetString(1), Is.EqualTo("Value_B1"));
+
+        reader.Read();
+        Assert.That(reader.GetString(0), Is.EqualTo("Value_A2"));
+        Assert.That(reader.GetString(1), Is.EqualTo("Value_B2"));
+    }
+
+    [Test]
+    public void Read_XlsmExcel20()
+    {
+        using var stream = Configuration.GetTestWorkbook(Path.Combine("xls", "MACRO1.XLM"));
+        using var reader = OpenReader(stream);
+
+        reader.Read();
+        Assert.That(reader.GetValue(0), Is.EqualTo("Record1"));
+        Assert.That(reader.GetValue(2), Is.EqualTo(null));
+
+        reader.Read();
+        Assert.That(reader.GetValue(0), Is.EqualTo(double.NaN));
+        Assert.That(reader.GetValue(2), Is.EqualTo(1));
+        Assert.That(reader.GetValue(3), Is.EqualTo(3));
+
+        reader.Read();
+        Assert.That(reader.GetValue(0), Is.EqualTo(double.NaN));
+        Assert.That(reader.GetValue(2), Is.EqualTo(2));
+        Assert.That(reader.GetValue(3), Is.EqualTo(4));
     }
 
     protected override IExcelDataReader OpenReader(Stream stream, ExcelReaderConfiguration configuration = null)
