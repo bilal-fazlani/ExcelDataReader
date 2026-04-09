@@ -236,7 +236,7 @@ internal sealed class CsvParser
     private void AddValueToRow()
     {
         RowResult.Add(ValueResult.ToString(0, ValueResult.Length - TrailingWhitespaceCount));
-        ValueResult = new StringBuilder();
+        ValueResult.Clear();
         TrailingWhitespaceCount = 0;
     }
 

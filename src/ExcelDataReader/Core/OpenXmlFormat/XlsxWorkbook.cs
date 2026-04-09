@@ -24,7 +24,11 @@ internal sealed class XlsxWorkbook : CommonWorkbook, IWorkbook<XlsxWorksheet>
 
     private List<SheetRecord> Sheets { get; } = [];
 
-    public IEnumerable<XlsxWorksheet> ReadWorksheets() => Sheets.Select(sheet => new XlsxWorksheet(_zipWorker, this, sheet, SinglePassMode));
+    public IEnumerable<XlsxWorksheet> ReadWorksheets()
+    {
+        foreach (var sheet in Sheets)
+            yield return new XlsxWorksheet(_zipWorker, this, sheet, SinglePassMode);
+    }
 
     private void ReadWorkbook()
     {
@@ -57,6 +61,9 @@ internal sealed class XlsxWorkbook : CommonWorkbook, IWorkbook<XlsxWorksheet>
         {
             switch (record)
             {
+                case SstCountRecord countRecord:
+                    SST.Capacity = countRecord.UniqueCount;
+                    break;
                 case SharedStringRecord pr:
                     SST.Add(pr.Value);
                     break;

@@ -323,8 +323,20 @@ internal sealed class XlsBiffStream : IDisposable
     /// </summary>
     private void AlignBlockDecryptor(int blockOffset)
     {
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+        var bytes = System.Buffers.ArrayPool<byte>.Shared.Rent(blockOffset);
+        try
+        {
+            CryptoHelpers.DecryptBytes(CipherTransform, bytes, blockOffset);
+        }
+        finally
+        {
+            System.Buffers.ArrayPool<byte>.Shared.Return(bytes);
+        }
+#else
         var bytes = new byte[blockOffset];
-        CryptoHelpers.DecryptBytes(CipherTransform, bytes, bytes.Length);
+        CryptoHelpers.DecryptBytes(CipherTransform, bytes, blockOffset);
+#endif
     }
 
     private void DecryptRecord(int startPosition, BIFFRECORDTYPE id, byte[] bytes, int recordSize)
@@ -343,44 +355,57 @@ internal sealed class XlsBiffStream : IDisposable
                 break;
         }
 
-        var position = 0;
-        while (position < recordSize)
-        {
-            var offset = startPosition + position;
-            int blockNumber = offset / 1024;
-            var blockOffset = offset % 1024;
-
-            if (blockNumber != CipherBlock)
-            {
-                CreateBlockDecryptor(blockNumber);
-            }
-
-            if (Encryption.IsXor)
-            {
-                // Bypass everything and hook into the XorTransform instance to set the XorArrayIndex pr record.
-                // This is a hack to use the XorTransform otherwise transparently to the other encryption methods.
-                var xorTransform = (XorManaged.XorTransform)CipherTransform;
-                xorTransform.XorArrayIndex = offset + recordSize - 4;
-            }
-
-            // Decrypt at most up to the next 1024 byte boundary
-            var chunkSize = Math.Min(recordSize - position, 1024 - blockOffset);
-
+        // Max chunk size per iteration is 1024 (one encryption block boundary).
+        // Rent both buffers once and reuse across iterations to avoid per-iteration allocations.
 #if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
-            var block = System.Buffers.ArrayPool<byte>.Shared.Rent(chunkSize);
+        var inputBlock = System.Buffers.ArrayPool<byte>.Shared.Rent(1024);
+        var outputBlock = System.Buffers.ArrayPool<byte>.Shared.Rent(1024);
 #else
-            var block = new byte[chunkSize];
+        var inputBlock = new byte[1024];
+        var outputBlock = new byte[1024];
 #endif
-
-            Array.Copy(bytes, position, block, 0, chunkSize);
-
-            var decryptedblock = CryptoHelpers.DecryptBytes(CipherTransform, block, chunkSize);
-            for (var i = 0; i < decryptedblock.Length; i++)
+        try
+        {
+            var position = 0;
+            while (position < recordSize)
             {
-                if (position >= startDecrypt)
-                    bytes[position] = decryptedblock[i];
-                position++;
+                var offset = startPosition + position;
+                int blockNumber = offset / 1024;
+                var blockOffset = offset % 1024;
+
+                if (blockNumber != CipherBlock)
+                {
+                    CreateBlockDecryptor(blockNumber);
+                }
+
+                if (Encryption.IsXor)
+                {
+                    // Bypass everything and hook into the XorTransform instance to set the XorArrayIndex pr record.
+                    // This is a hack to use the XorTransform otherwise transparently to the other encryption methods.
+                    var xorTransform = (XorManaged.XorTransform)CipherTransform;
+                    xorTransform.XorArrayIndex = offset + recordSize - 4;
+                }
+
+                // Decrypt at most up to the next 1024 byte boundary
+                var chunkSize = Math.Min(recordSize - position, 1024 - blockOffset);
+
+                Array.Copy(bytes, position, inputBlock, 0, chunkSize);
+                CryptoHelpers.DecryptBytes(CipherTransform, inputBlock, chunkSize, outputBlock);
+
+                for (var i = 0; i < chunkSize; i++)
+                {
+                    if (position >= startDecrypt)
+                        bytes[position] = outputBlock[i];
+                    position++;
+                }
             }
+        }
+        finally
+        {
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+            System.Buffers.ArrayPool<byte>.Shared.Return(inputBlock);
+            System.Buffers.ArrayPool<byte>.Shared.Return(outputBlock);
+#endif
         }
     }
 }

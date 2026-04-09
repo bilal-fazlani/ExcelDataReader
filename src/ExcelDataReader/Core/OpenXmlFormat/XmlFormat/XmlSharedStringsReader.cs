@@ -7,12 +7,19 @@ internal sealed class XmlSharedStringsReader(XmlReader reader) : XmlRecordReader
 {
     private const string ElementSst = "sst";
     private const string ElementStringItem = "si";
+    private const string AttributeUniqueCount = "uniqueCount";
 
     protected override IEnumerable<Record> ReadOverride()
     {
         if (!Reader.IsStartElement(ElementSst, ProperNamespaces.NsSpreadsheetMl))
         {
             yield break;
+        }
+
+        var uniqueCountStr = Reader.GetAttribute(AttributeUniqueCount);
+        if (int.TryParse(uniqueCountStr, out var uniqueCount) && uniqueCount > 0)
+        {
+            yield return new SstCountRecord(uniqueCount);
         }
 
         if (!XmlReaderHelper.ReadFirstContent(Reader))

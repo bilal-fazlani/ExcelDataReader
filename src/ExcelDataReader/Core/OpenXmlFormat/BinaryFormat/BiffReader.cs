@@ -18,11 +18,28 @@ internal abstract class BiffReader(Stream stream) : RecordReader
             !TryReadVariableValue(out var recordLength))
             return null;
 
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+        bool rented = recordLength >= _buffer.Length;
+        byte[] buffer = rented
+            ? System.Buffers.ArrayPool<byte>.Shared.Rent((int)recordLength)
+            : _buffer;
+#else
         byte[] buffer = recordLength < _buffer.Length ? _buffer : new byte[recordLength];
-        if (Stream.ReadAtLeast(buffer, 0, (int)recordLength) != recordLength)
-            return null;
+#endif
+        try
+        {
+            if (Stream.ReadAtLeast(buffer, 0, (int)recordLength) != recordLength)
+                return null;
 
-        return ReadOverride(buffer, recordId, recordLength);
+            return ReadOverride(buffer, recordId, recordLength);
+        }
+        finally
+        {
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+            if (rented)
+                System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+#endif
+        }
     }
 
     protected static uint GetDWord(byte[] buffer, uint offset)
@@ -51,12 +68,7 @@ internal abstract class BiffReader(Stream stream) : RecordReader
     }
 
     protected static string GetString(byte[] buffer, uint offset, uint length)
-    {
-        StringBuilder sb = new((int)length);
-        for (uint i = offset; i < offset + 2 * length; i += 2)
-            sb.Append((char)GetWord(buffer, i));
-        return sb.ToString();
-    }
+        => Encoding.Unicode.GetString(buffer, (int)offset, (int)(length * 2));
 
     protected static string? GetNullableString(byte[] buffer, ref uint offset)
     {
@@ -64,11 +76,9 @@ internal abstract class BiffReader(Stream stream) : RecordReader
         offset += 4;
         if (length == uint.MaxValue)
             return null;
-        StringBuilder sb = new((int)length);
-        uint end = offset + length * 2;
-        for (; offset < end; offset += 2)
-            sb.Append((char)GetWord(buffer, offset));
-        return sb.ToString();
+        string result = Encoding.Unicode.GetString(buffer, (int)offset, (int)(length * 2));
+        offset += length * 2;
+        return result;
     }
 
     protected static double GetRkNumber(byte[] buffer, uint offset)

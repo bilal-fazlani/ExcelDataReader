@@ -5,6 +5,21 @@ namespace ExcelDataReader.Tests;
 public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
 {
     [Test]
+    public void GitIssue525_XlsxSstPreallocationReturnsCorrectStrings()
+    {
+        // Verify that pre-allocating XlsxSST based on uniqueCount doesn't break SST string resolution.
+        // XlsxWorkbook.ReadSharedStrings() sets SST.Capacity = uniqueCount from <sst uniqueCount="...">
+        using var reader = OpenReader("Test10x10");
+        reader.Read();
+        Assert.That(reader.GetString(0), Is.EqualTo("col1"));
+        Assert.That(reader.GetString(4), Is.EqualTo("col5"));
+        Assert.That(reader.GetString(9), Is.Null);  // column 9 is empty in first row
+
+        reader.Read();
+        Assert.That(reader.GetString(0), Is.EqualTo("10x10"));
+    }
+
+    [Test]
     public void GitIssue14InvalidOADate()
     {
         using var excelReader = ExcelReaderFactory.CreateOpenXmlReader(Configuration.GetTestWorkbook("Test_git_issue_14_InvalidOADate.xlsx"));

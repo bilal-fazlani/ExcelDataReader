@@ -7,8 +7,9 @@ namespace ExcelDataReader.Core.BinaryFormat;
 /// </summary>
 internal sealed class XlsBiffSST : XlsBiffRecord
 {
-    private readonly List<IXlsString> _strings = [];
     private readonly XlsSSTReader _reader = new();
+    private string[] _materializedStrings;
+    private List<IXlsString> _strings = [];
 
     internal XlsBiffSST(byte[] bytes)
         : base(bytes)
@@ -54,20 +55,36 @@ internal sealed class XlsBiffSST : XlsBiffRecord
         {
             _strings.Add(str);
         }
+
+        _materializedStrings = new string[_strings.Count];
     }
 
     /// <summary>
-    /// Returns string at specified index.
+    /// Returns string at specified index, caching it on first access and releasing the raw byte buffer.
     /// </summary>
     /// <param name="sstIndex">Index of string to get.</param>
     /// <param name="encoding">Workbook encoding.</param>
     /// <returns>string value if it was found, empty string otherwise.</returns>
     public string GetString(uint sstIndex, Encoding encoding)
     {
-        if (sstIndex < _strings.Count)
-            return _strings[(int)sstIndex].GetValue(encoding);
+        if (_materializedStrings == null)
+        {
+            if (sstIndex < _strings.Count)
+                return _strings[(int)sstIndex].GetValue(encoding);
+            return null;
+        }
 
-        return null; // #VALUE error
+        if (sstIndex >= (uint)_materializedStrings.Length)
+            return null;
+
+        var cached = _materializedStrings[sstIndex];
+        if (cached != null)
+            return cached;
+
+        var s = _strings[(int)sstIndex].GetValue(encoding);
+        _materializedStrings[sstIndex] = s;
+        _strings[(int)sstIndex] = null;
+        return s;
     }
 
     /// <summary>

@@ -30,12 +30,20 @@ internal sealed class XlsUnicodeString(byte[] bytes, uint offset) : IXlsString
             return Encoding.Unicode.GetString(_bytes, (int)_offset + 3, CharacterCount * 2);
         }
 
-        byte[] bytes = new byte[CharacterCount * 2];
-        for (int i = 0; i < CharacterCount; i++)
+        // In BIFF8 single-byte strings each byte value IS the Unicode code point,
+        // so a direct (char)byte cast is the exact and encoding-free conversion.
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+        return string.Create(CharacterCount, (Bytes: _bytes, Start: (int)_offset + 3), static (span, state) =>
         {
-            bytes[i * 2] = _bytes[_offset + 3 + i];
-        }
-
-        return Encoding.Unicode.GetString(bytes);
+            for (int i = 0; i < span.Length; i++)
+                span[i] = (char)state.Bytes[state.Start + i];
+        });
+#else
+        var chars = new char[CharacterCount];
+        int start = (int)_offset + 3;
+        for (int i = 0; i < CharacterCount; i++)
+            chars[i] = (char)_bytes[start + i];
+        return new string(chars);
+#endif
     }
 }

@@ -81,4 +81,11 @@ internal static class CryptoHelpers
         csDecrypt.ReadAtLeast(result, 0, length);
         return result;
     }
+
+    public static void DecryptBytes(ICryptoTransform transform, byte[] bytes, int chunkSize, byte[] output)
+    {
+        using MemoryStream msDecrypt = new(bytes, 0, chunkSize);
+        using CryptoStream csDecrypt = new(msDecrypt, transform, CryptoStreamMode.Read);
+        csDecrypt.ReadAtLeast(output, 0, chunkSize);
+    }
 }

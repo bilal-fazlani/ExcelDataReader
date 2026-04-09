@@ -72,6 +72,7 @@ internal class CommonWorkbook
 #pragma warning restore CA1304
         if (numberFormat != null)
         {
+            Formats[numberFormatIndex] = numberFormat; // cache for future lookups
             return numberFormat;
         }
 

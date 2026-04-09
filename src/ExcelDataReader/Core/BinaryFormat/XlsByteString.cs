@@ -20,14 +20,7 @@ internal sealed class XlsByteString(byte[] bytes, uint offset) : IXlsString
     /// </summary>
     public string GetValue(Encoding encoding)
     {
-        var stringBytes = ReadArray(0x2, CharacterCount * (Helpers.IsSingleByteEncoding(encoding) ? 1 : 2));
-        return encoding.GetString(stringBytes, 0, stringBytes.Length);
-    }
-
-    public byte[] ReadArray(int offset, int size)
-    {
-        byte[] tmp = new byte[size];
-        Buffer.BlockCopy(_bytes, (int)(_offset + offset), tmp, 0, size);
-        return tmp;
+        int byteCount = CharacterCount * (Helpers.IsSingleByteEncoding(encoding) ? 1 : 2);
+        return encoding.GetString(_bytes, (int)_offset + 2, byteCount);
     }
 }

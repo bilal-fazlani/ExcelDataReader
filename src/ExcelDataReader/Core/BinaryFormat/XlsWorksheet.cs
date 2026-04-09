@@ -1,5 +1,4 @@
 using System.Text;
-using ExcelDataReader.Log;
 
 namespace ExcelDataReader.Core.BinaryFormat;
 
@@ -228,8 +227,7 @@ internal sealed class XlsWorksheet : IWorksheet
 
                 if (cell.Id == BIFFRECORDTYPE.MULRK)
                 {
-                    var cellValues = ReadMultiCell(cell);
-                    cellList.AddRange(cellValues);
+                    ReadMultiCell(cell, cellList);
                 }
                 else
                 {
@@ -276,24 +274,19 @@ internal sealed class XlsWorksheet : IWorksheet
         return result[i]!.Value.Cells;
     }
 
-    private IEnumerable<Cell> ReadMultiCell(XlsBiffBlankCell cell)
+    private void ReadMultiCell(XlsBiffBlankCell cell, List<Cell> cellList)
     {
-        LogManager.Log(this).Debug("ReadMultiCell {0}", cell.Id);
-
         switch (cell.Id)
         {
             case BIFFRECORDTYPE.MULRK:
-
                 XlsBiffMulRKCell rkCell = (XlsBiffMulRKCell)cell;
                 ushort lastColumnIndex = rkCell.LastColumnIndex;
                 for (ushort j = cell.ColumnIndex; j <= lastColumnIndex; j++)
                 {
                     var xfIndex = rkCell.GetXF(j);
                     var effectiveStyle = Workbook.GetEffectiveCellStyle(xfIndex, cell.Format);
-
                     var value = TryConvertOADateTime(rkCell.GetValue(j), effectiveStyle.NumberFormatIndex);
-                    LogManager.Log(this).Debug("CELL[{0}] = {1}", j, value);
-                    yield return new Cell(j, value, effectiveStyle, null);
+                    cellList.Add(new Cell(j, value, effectiveStyle, null));
                 }
 
                 break;
@@ -305,8 +298,6 @@ internal sealed class XlsWorksheet : IWorksheet
     /// </summary>
     private Cell ReadSingleCell(XlsBiffStream biffStream, XlsBiffBlankCell cell, int xfIndex)
     {
-        LogManager.Log(this).Debug("ReadSingleCell {0}", cell.Id);
-
         var effectiveStyle = Workbook.GetEffectiveCellStyle(xfIndex, cell.Format);
         var numberFormatIndex = effectiveStyle.NumberFormatIndex;
 
@@ -697,7 +688,7 @@ internal sealed class XlsWorksheet : IWorksheet
                         {
                             if (cell.Id == BIFFRECORDTYPE.MULRK)
                             {
-                                currentRowCells.AddRange(ReadMultiCell(cell));
+                                ReadMultiCell(cell, currentRowCells);
                             }
                             else
                             {
