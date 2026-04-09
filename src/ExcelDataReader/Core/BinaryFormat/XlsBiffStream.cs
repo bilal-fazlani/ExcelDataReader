@@ -10,7 +10,17 @@ namespace ExcelDataReader.Core.BinaryFormat;
 /// </summary>
 internal sealed class XlsBiffStream : IDisposable
 {
-    private byte[] _headerBuffer = new byte[4];
+    // Read-ahead buffer: a single BaseStream.Read() fills 1 024 bytes that then serve
+    // ~70 sequential small records (avg 14 bytes each) without further CompoundStream calls.
+    // Any Seek() sets _readAheadStart == _readAheadEnd to invalidate it.
+    // Uses only byte[], Buffer.BlockCopy and Stream.Read — available on all target frameworks.
+    private const int ReadAheadSize = 1024;
+
+    private readonly byte[] _headerBuffer = new byte[4];
+
+    private readonly byte[] _readAheadBuffer = new byte[ReadAheadSize];
+    private int _readAheadStart;
+    private int _readAheadEnd;
 
     public XlsBiffStream(Stream baseStream, int offset = 0, int explicitVersion = 0, BIFFTYPE? defaultType = null, string password = null, byte[] secretKey = null, EncryptionInfo encryption = null)
     {
@@ -78,7 +88,11 @@ internal sealed class XlsBiffStream : IDisposable
     /// <summary>
     /// Gets or sets the current position in BIFF stream.
     /// </summary>
-    public int Position { get => (int)BaseStream.Position; set => Seek(value, SeekOrigin.Begin); }
+    public int Position
+    {
+        get => (int)BaseStream.Position - (_readAheadEnd - _readAheadStart);
+        set => Seek(value, SeekOrigin.Begin);
+    }
 
     public Stream BaseStream { get; }
 
@@ -105,6 +119,9 @@ internal sealed class XlsBiffStream : IDisposable
     /// <param name="origin">Offset origin.</param>
     public void Seek(int offset, SeekOrigin origin)
     {
+        // Discard buffered bytes: they belong to the old position.
+        _readAheadStart = 0;
+        _readAheadEnd = 0;
         BaseStream.Seek(offset, origin);
 
         if (Position < 0)
@@ -146,20 +163,28 @@ internal sealed class XlsBiffStream : IDisposable
     /// <returns>The record -or- null.</returns>
     public XlsBiffRecord GetRecord(Stream stream)
     {
-        var recordOffset = (int)stream.Position;
-        stream.ReadAtLeast(_headerBuffer, 0, 4);
+        // Capture the logical record start before consuming header bytes from the read-ahead
+        // buffer; this is the value DecryptRecord() needs for its block-number calculation.
+        var recordOffset = Position;
+        ReadFromReadAhead(_headerBuffer, 0, 4);
 
         // Does this work on a big endian system?
         var id = (BIFFRECORDTYPE)BitConverter.ToUInt16(_headerBuffer, 0);
         ushort recordSize = BitConverter.ToUInt16(_headerBuffer, 2);
 
 #if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
-        var bytes = System.Buffers.ArrayPool<byte>.Shared.Rent(4 + recordSize);
+        // Records at or below SmallRecordPoolThreshold bytes use a plain heap allocation.
+        // ArrayPool.Rent+Return overhead exceeds the benefit for these tiny buffers.
+        // Rented buffers always have Length > SmallRecordPoolThreshold (pool rounds up to
+        // the next power-of-two bucket), so XlsBiffRecord.Return() can tell them apart.
+        var bytes = (4 + recordSize) <= XlsBiffRecord.SmallRecordPoolThreshold
+            ? new byte[4 + recordSize]
+            : System.Buffers.ArrayPool<byte>.Shared.Rent(4 + recordSize);
 #else
         var bytes = new byte[4 + recordSize];
 #endif
         Array.Copy(_headerBuffer, bytes, 4);
-        stream.ReadAtLeast(bytes, 4, recordSize);
+        ReadFromReadAhead(bytes, 4, recordSize);
         
         if (SecretKey != null)
             DecryptRecord(recordOffset, id, bytes, 4 + recordSize);
@@ -304,6 +329,51 @@ internal sealed class XlsBiffStream : IDisposable
         }
 
         return 0;
+    }
+
+    // Serves 'count' bytes into dest[destOffset..], draining the read-ahead buffer first.
+    // When the buffer is exhausted it is refilled with a single BaseStream.Read(1024).
+    // For large bodies that exceed the remaining buffer the tail is read directly from
+    // BaseStream in one call (avoids per-1024-chunk overhead for SST / other big records).
+    private void ReadFromReadAhead(byte[] dest, int destOffset, int count)
+    {
+        // Fast path: serve from the in-memory buffer when possible.
+        int available = _readAheadEnd - _readAheadStart;
+        if (available > 0)
+        {
+            int fromBuffer = Math.Min(available, count);
+            Buffer.BlockCopy(_readAheadBuffer, _readAheadStart, dest, destOffset, fromBuffer);
+            _readAheadStart += fromBuffer;
+
+            if (fromBuffer == count)
+                return;
+
+            destOffset += fromBuffer;
+            count -= fromBuffer;
+        }
+
+        // Buffer was exhausted before satisfying the request.
+        // For small leftovers refill the buffer and serve from it;
+        // for large reads go directly to BaseStream to avoid per-chunk overhead.
+        if (count <= ReadAheadSize)
+        {
+            _readAheadStart = 0;
+            _readAheadEnd = BaseStream.Read(_readAheadBuffer, 0, ReadAheadSize);
+            if (_readAheadEnd < count)
+                throw new EndOfStreamException();
+
+            Buffer.BlockCopy(_readAheadBuffer, 0, dest, destOffset, count);
+            _readAheadStart = count;
+        }
+        else
+        {
+            // Large record body: read directly into the caller's buffer.
+            // The read-ahead buffer remains empty (_readAheadStart == _readAheadEnd == 0)
+            // and will be refilled on the next call.
+            _readAheadStart = 0;
+            _readAheadEnd = 0;
+            BaseStream.ReadAtLeast(dest, destOffset, count);
+        }
     }
 
     /// <summary>

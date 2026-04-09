@@ -15,14 +15,15 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.3" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.6.37125.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ExcelDataReader\ExcelDataReader.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\TestData\Test10x10000.xlsx"/>
-    <EmbeddedResource Include="..\TestData\Test10x10000.xlsb"/>
-    <EmbeddedResource Include="..\TestData\Test10x10000.xls"/>
-    <EmbeddedResource Include="..\TestData\Test_git_issue289.xlsx"/>
+    <EmbeddedResource Include="..\TestData\Test10x10000.xlsx" />
+    <EmbeddedResource Include="..\TestData\Test10x10000.xlsb" />
+    <EmbeddedResource Include="..\TestData\Test10x10000.xls" />
+    <EmbeddedResource Include="..\TestData\Test_git_issue289.xlsx" />
   </ItemGroup>
 </Project>

@@ -78,7 +78,7 @@ internal sealed class XmlWorksheetReader(XmlReader reader, bool preparing) : Xml
                         int seqRowIndex = -1;
                         while (!Reader.EOF)
                         {
-                            if (Reader.IsStartElement(NRow, ProperNamespaces.NsSpreadsheetMl))
+                            if (Reader.NodeType == XmlNodeType.Element && Reader.LocalName == NRow)
                             {
                                 // Mirror ReadOverride: use r attribute if valid, otherwise sequential
                                 if (int.TryParse(Reader.GetAttribute(AR), out int arValue))
@@ -92,10 +92,10 @@ internal sealed class XmlWorksheetReader(XmlReader reader, bool preparing) : Xml
                                 {
                                     int nextColumnIndex = 0;
                                     while (!Reader.EOF)
-                                    {
-                                        if (Reader.IsStartElement(NC, ProperNamespaces.NsSpreadsheetMl))
-                                        {
-                                            // Mirror ReadCell: use the r attribute if valid, otherwise sequential
+                                     {
+                                         if (Reader.NodeType == XmlNodeType.Element && Reader.LocalName == NC)
+                                         {
+                                             // Mirror ReadCell: use the r attribute if valid, otherwise sequential
                                             int colIndex;
                                             if (ReferenceHelper.ParseReference(Reader.GetAttribute(AR), out int referenceColumn, out _))
                                                 colIndex = referenceColumn - 1;
@@ -138,7 +138,7 @@ internal sealed class XmlWorksheetReader(XmlReader reader, bool preparing) : Xml
                     int rowIndex = -1;
                     while (!Reader.EOF)
                     {
-                        if (Reader.IsStartElement(NRow, ProperNamespaces.NsSpreadsheetMl))
+                        if (Reader.NodeType == XmlNodeType.Element && Reader.LocalName == NRow)
                         {
                             if (int.TryParse(Reader.GetAttribute(AR), out int arValue))
                                 rowIndex = arValue - 1; // The row attribute is 1-based
@@ -162,7 +162,7 @@ internal sealed class XmlWorksheetReader(XmlReader reader, bool preparing) : Xml
                             int nextColumnIndex = 0;
                             while (!Reader.EOF)
                             {
-                                if (Reader.IsStartElement(NC, ProperNamespaces.NsSpreadsheetMl))
+                                if (Reader.NodeType == XmlNodeType.Element && Reader.LocalName == NC)
                                 {
                                     var cell = ReadCell(nextColumnIndex, ProperNamespaces.NsSpreadsheetMl);
                                     nextColumnIndex = cell.ColumnIndex + 1;
@@ -354,13 +354,13 @@ internal sealed class XmlWorksheetReader(XmlReader reader, bool preparing) : Xml
         CellError? error = null;
         while (!Reader.EOF)
         {
-            if (Reader.IsStartElement(NV, nsSpreadsheetMl))
+            if (Reader.NodeType == XmlNodeType.Element && Reader.LocalName == NV)
             {
                 string rawValue = Reader.ReadElementContentAsString();
                 if (!string.IsNullOrEmpty(rawValue))
                     ConvertCellValue(rawValue, aT, out value, out error);
             }
-            else if (Reader.IsStartElement(NIs, nsSpreadsheetMl))
+            else if (Reader.NodeType == XmlNodeType.Element && Reader.LocalName == NIs)
             {
                 string rawValue = StringHelper.ReadStringItem(Reader, nsSpreadsheetMl);
                 if (!string.IsNullOrEmpty(rawValue))

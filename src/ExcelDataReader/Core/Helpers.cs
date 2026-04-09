@@ -32,6 +32,11 @@ internal static partial class Helpers
 
     public static string ConvertEscapeChars(string input)
     {
+        // Fast rejection: the escape pattern always starts with "_x". For typical
+        // spreadsheet strings this short-circuits before the regex engine is entered.
+        if (input.IndexOf("_x", StringComparison.Ordinal) < 0)
+            return input;
+
         return EscapeRegex().Replace(input, m => ((char)uint.Parse(m.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture)).ToString());
     }
 

@@ -6,8 +6,16 @@ namespace ExcelDataReader.Core.BinaryFormat;
 /// </summary>
 internal class XlsBiffRecord
 {
+    // Records with a total buffer size at or below this threshold are allocated with
+    // new byte[] rather than rented from ArrayPool. The pool's per-operation overhead
+    // (bucket lookup + thread-local push/pop) exceeds the benefit for tiny buffers.
+    // Rented buffers always have Length > SmallRecordPoolThreshold because ArrayPool
+    // rounds up to the next power-of-two bucket (≥128 when totalSize > 64), so the
+    // check in Return() reliably distinguishes heap-allocated from pool-rented arrays.
+    internal const int SmallRecordPoolThreshold = 64;
+
     protected const int ContentOffset = 4;
-    
+       
     public XlsBiffRecord(byte[] bytes)
     {
         if (bytes.Length < 4)
@@ -35,7 +43,10 @@ internal class XlsBiffRecord
     #if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
     public virtual void Return()
     {        
-        System.Buffers.ArrayPool<byte>.Shared.Return(Bytes);
+        // Only buffers rented from ArrayPool need to be returned.
+        // Heap-allocated small records (Bytes.Length <= SmallRecordPoolThreshold) are GC-managed.
+        if (Bytes.Length > SmallRecordPoolThreshold)
+            System.Buffers.ArrayPool<byte>.Shared.Return(Bytes);
     }
     #endif
 

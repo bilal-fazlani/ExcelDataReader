@@ -29,7 +29,7 @@ internal sealed class XmlSharedStringsReader(XmlReader reader) : XmlRecordReader
 
         while (!Reader.EOF)
         {
-            if (Reader.IsStartElement(ElementStringItem, ProperNamespaces.NsSpreadsheetMl))
+            if (Reader.NodeType == XmlNodeType.Element && Reader.LocalName == ElementStringItem)
             {
                 var value = StringHelper.ReadStringItem(Reader, ProperNamespaces.NsSpreadsheetMl);
                 yield return new SharedStringRecord(value);

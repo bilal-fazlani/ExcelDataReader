@@ -8,7 +8,7 @@ namespace ExcelDataReader.Core.OpenXmlFormat.BinaryFormat;
 
 internal abstract class BiffReader(Stream stream) : RecordReader
 {
-    private readonly byte[] _buffer = new byte[128];
+    private readonly byte[] _buffer = new byte[512];
 
     private Stream Stream { get; } = stream ?? throw new ArgumentNullException(nameof(stream));
 
@@ -68,7 +68,13 @@ internal abstract class BiffReader(Stream stream) : RecordReader
     }
 
     protected static string GetString(byte[] buffer, uint offset, uint length)
-        => Encoding.Unicode.GetString(buffer, (int)offset, (int)(length * 2));
+    {
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+        return Encoding.Unicode.GetString(buffer.AsSpan((int)offset, (int)(length * 2)));
+#else
+        return Encoding.Unicode.GetString(buffer, (int)offset, (int)(length * 2));
+#endif
+    }
 
     protected static string? GetNullableString(byte[] buffer, ref uint offset)
     {
@@ -76,7 +82,11 @@ internal abstract class BiffReader(Stream stream) : RecordReader
         offset += 4;
         if (length == uint.MaxValue)
             return null;
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+        string result = Encoding.Unicode.GetString(buffer.AsSpan((int)offset, (int)(length * 2)));
+#else
         string result = Encoding.Unicode.GetString(buffer, (int)offset, (int)(length * 2));
+#endif
         offset += length * 2;
         return result;
     }

@@ -4,6 +4,10 @@ namespace ExcelDataReader.Core.CompoundFormat;
 
 internal sealed class CompoundStream : Stream
 {
+    private readonly byte[] _sectorBuffer;
+
+    private int _sectorBufferValidLength;
+
     public CompoundStream(CompoundDocument document, Stream baseStream, List<uint> sectorChain, int length, bool leaveOpen)
     {
         Document = document;
@@ -12,6 +16,7 @@ internal sealed class CompoundStream : Stream
         LeaveOpen = leaveOpen;
         Length = length;
         SectorChain = sectorChain;
+        _sectorBuffer = new byte[Document.Header.SectorSize];
         ReadSector();
     }
 
@@ -27,10 +32,12 @@ internal sealed class CompoundStream : Stream
         {
             SectorChain = CompoundDocument.GetSectorChain(baseSector, Document.MiniSectorTable);
             RootSectorChain = CompoundDocument.GetSectorChain(Document.RootEntry.StreamFirstSector, Document.SectorTable);
+            _sectorBuffer = new byte[Document.Header.MiniSectorSize];
         }
         else
         {
             SectorChain = CompoundDocument.GetSectorChain(baseSector, Document.SectorTable);
+            _sectorBuffer = new byte[Document.Header.SectorSize];
         }
 
         ReadSector();
@@ -48,7 +55,7 @@ internal sealed class CompoundStream : Stream
 
     public override long Length { get; }
 
-    public override long Position { get => Offset - SectorBytes.Length + SectorOffset; set => Seek(value, SeekOrigin.Begin); }
+    public override long Position { get => Offset - _sectorBufferValidLength + SectorOffset; set => Seek(value, SeekOrigin.Begin); }
 
     private Stream BaseStream { get; set; }
 
@@ -64,8 +71,6 @@ internal sealed class CompoundStream : Stream
 
     private int SectorOffset { get; set; }
 
-    private byte[] SectorBytes { get; set; }
-
     public override void Flush()
     {
     }
@@ -75,14 +80,14 @@ internal sealed class CompoundStream : Stream
         int index = 0;
         while (index < count && Position < Length)
         {
-            if (SectorOffset == SectorBytes.Length)
+            if (SectorOffset == _sectorBufferValidLength)
             {
                 ReadSector();
                 SectorOffset = 0;
             }
 
-            var chunkSize = Math.Min(count - index, SectorBytes.Length - SectorOffset);
-            Array.Copy(SectorBytes, SectorOffset, buffer, offset + index, chunkSize);
+            var chunkSize = Math.Min(count - index, _sectorBufferValidLength - SectorOffset);
+            Array.Copy(_sectorBuffer, SectorOffset, buffer, offset + index, chunkSize);
             index += chunkSize;
             SectorOffset += chunkSize;
         }
@@ -161,12 +166,12 @@ internal sealed class CompoundStream : Stream
         BaseStream.Seek(Document.GetSectorOffset(rootSector) + rootOffset, SeekOrigin.Begin);
 
         var chunkSize = (int)Math.Min(Length - Offset, Document.Header.MiniSectorSize);
-        SectorBytes = new byte[chunkSize];
-        if (BaseStream.ReadAtLeast(SectorBytes, 0, chunkSize) < chunkSize)
+        if (BaseStream.ReadAtLeast(_sectorBuffer, 0, chunkSize) < chunkSize)
         {
             throw new CompoundDocumentException(Errors.ErrorEndOfFile);
         }
 
+        _sectorBufferValidLength = chunkSize;
         Offset += chunkSize;
         SectorChainOffset++;
     }
@@ -177,12 +182,12 @@ internal sealed class CompoundStream : Stream
         BaseStream.Seek(Document.GetSectorOffset(sector), SeekOrigin.Begin);
 
         var chunkSize = (int)Math.Min(Length - Offset, Document.Header.SectorSize);
-        SectorBytes = new byte[chunkSize];
-        if (BaseStream.ReadAtLeast(SectorBytes, 0, chunkSize) < chunkSize)
+        if (BaseStream.ReadAtLeast(_sectorBuffer, 0, chunkSize) < chunkSize)
         {
             throw new CompoundDocumentException(Errors.ErrorEndOfFile);
         }
 
+        _sectorBufferValidLength = chunkSize;
         Offset += chunkSize;
         SectorChainOffset++;
     }

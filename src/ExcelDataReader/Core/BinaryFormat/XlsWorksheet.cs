@@ -157,17 +157,39 @@ internal sealed class XlsWorksheet : IWorksheet
         var rowIndex = 0;
         List<List<Cell>> cellListPool = [];
 
-        while (rowIndex < RowCount)
-        {
-            GetBlockSize(rowIndex, out var blockRowCount, out var minOffset, out var maxOffset);
+        // blockRowCount is declared here so the finally block can see its current value
+        // for the early-disposal safety clear (blockRowCount == 0 after normal completion).
+        var blockRowCount = 0;
 
 #if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
-            var block = System.Buffers.ArrayPool<Row?>.Shared.Rent(blockRowCount);
+        // Rent once for the lifetime of the loop. For most files blockRowCount stays at
+        // Math.Min(32, RowCount) throughout, so a single Rent/Return replaces the previous
+        // 313 Rent + 313 clearArray:true Return cycles for a 10 000-row worksheet.
+        var block = System.Buffers.ArrayPool<Row?>.Shared.Rent(Math.Max(1, Math.Min(32, RowCount)));
+        try
+        {
 #else
-            var block = new Row?[blockRowCount];
+        // On older targets allocate once and grow only when overlapping rows force a larger block.
+        var block = new Row?[Math.Max(1, Math.Min(32, RowCount))];
+        {
 #endif
-            try
+            while (rowIndex < RowCount)
             {
+                GetBlockSize(rowIndex, out blockRowCount, out var minOffset, out var maxOffset);
+
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+                if (blockRowCount > block.Length)
+                {
+                    // Rare: overlapping rows require a larger block. The current array is already
+                    // clean (all slots default), so return it without an extra clear pass.
+                    System.Buffers.ArrayPool<Row?>.Shared.Return(block, clearArray: false);
+                    block = System.Buffers.ArrayPool<Row?>.Shared.Rent(blockRowCount);
+                }
+#else
+                if (blockRowCount > block.Length)
+                    block = new Row?[blockRowCount];
+#endif
+
                 ReadNextBlock(biffStream, rowIndex, blockRowCount, minOffset, maxOffset, block, cellListPool);
 
                 for (var i = 0; i < blockRowCount; ++i)
@@ -176,22 +198,34 @@ internal sealed class XlsWorksheet : IWorksheet
                     {
                         yield return block[i]!.Value;
 
-                        // Safe: ReadCurrentRow() already consumed cells before this MoveNext resumed.
+                        // Safe: consumer has already processed the row's cells before MoveNext resumed.
                         var consumed = block[i]!.Value.Cells;
+
+                        // release List<Cell> reference immediately so the pool
+                        // return below does not need a bulk Array.Clear pass
+                        block[i] = default; 
                         consumed.Clear();
                         cellListPool.Add(consumed);
                     }
                 }
-            }
-            finally
-            {
-#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
-                System.Buffers.ArrayPool<Row?>.Shared.Return(block, clearArray: true);
-#endif
+
+                rowIndex += blockRowCount;
             }
 
-            rowIndex += blockRowCount;
+            blockRowCount = 0; // signal to finally: normal completion, all slots already cleared
         }
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+        finally
+        {
+            // On early disposal blockRowCount > 0 and some slots in the current block may
+            // still hold live Row? values; clear them so the pool does not retain references.
+            // On normal completion blockRowCount == 0, so this loop is a no-op.
+            for (var j = 0; j < blockRowCount; ++j)
+                block[j] = default;
+
+            System.Buffers.ArrayPool<Row?>.Shared.Return(block, clearArray: false);
+        }
+#endif
     }
 
     private void ReadNextBlock(XlsBiffStream biffStream, int startRow, int rows, int minOffset, int maxOffset, Row?[] result, List<List<Cell>> cellListPool)
