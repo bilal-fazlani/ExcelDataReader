@@ -51,6 +51,8 @@ internal abstract class ExcelDataReader<TWorkbook, TWorksheet> : IExcelDataReade
 
     public int RowCount => _worksheetIterator?.Current?.RowCount ?? 0;
 
+    public CellRange Dimension => _worksheetIterator?.Current?.Dimension;
+
     public int RecordsAffected => throw new NotSupportedException();
 
     public double RowHeight => _rowIterator?.Current?.Height ?? 0;

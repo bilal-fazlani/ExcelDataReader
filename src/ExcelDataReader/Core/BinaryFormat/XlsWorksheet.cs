@@ -80,6 +80,8 @@ internal sealed class XlsWorksheet : IWorksheet
 
     public int RowCount { get; private set; }
 
+    public CellRange Dimension { get; private set; }
+
     public bool IsDate1904 { get; private set; }
 
     public XlsWorkbook Workbook { get; }
@@ -459,6 +461,7 @@ internal sealed class XlsWorksheet : IWorksheet
                 case XlsBiffDimensions dims:
                     // FieldCount = dims.LastColumn;
                     RowCount = (int)dims.LastRow;
+                    Dimension = new CellRange(dims.FirstColumn, (int)dims.FirstRow, dims.LastColumn - 1, (int)dims.LastRow - 1);
                     break;
                 case XlsBiffDefaultRowHeight defaultRowHeightRecord:
                     DefaultRowHeight = defaultRowHeightRecord.RowHeight;
@@ -616,7 +619,7 @@ internal sealed class XlsWorksheet : IWorksheet
 
         public int MaxOverlapRowIndex { get; set; }
     }
-    
+
     private sealed class XlsRowBlock
     {
         public Dictionary<int, Row> Rows { get; } = [];
