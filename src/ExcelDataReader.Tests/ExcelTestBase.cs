@@ -1004,6 +1004,39 @@ public abstract class ExcelTestBase
     }
 
     [Test]
+    public void GitIssue618_SinglePassMode_RowCountThrows()
+    {
+        using var reader = OpenReader(OpenStream("Test10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        Assert.Throws<InvalidOperationException>(() => _ = reader.RowCount);
+        reader.Read();
+        Assert.Throws<InvalidOperationException>(() => _ = reader.RowCount);
+    }
+
+    [Test]
+    public void GitIssue618_SinglePassMode_AsDataSet()
+    {
+        using var reader = OpenReader(OpenStream("Test10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        var dataSet = reader.AsDataSet();
+        Assert.That(dataSet.Tables[0].Rows.Count, Is.EqualTo(10));
+        Assert.That(dataSet.Tables[0].Columns.Count, Is.EqualTo(10));
+        Assert.That(dataSet.Tables[0].Rows[1][0], Is.EqualTo("10x10"));
+        Assert.That(dataSet.Tables[0].Rows[9][9], Is.EqualTo("10x27"));
+    }
+
+    [Test]
+    public void GitIssue618_SinglePassMode_FieldCountGrows()
+    {
+        using var reader = OpenReader(OpenStream("Test10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        Assert.That(reader.FieldCount, Is.Zero);
+        reader.Read();
+        Assert.That(reader.FieldCount, Is.EqualTo(9));
+        while (reader.Read())
+        {            
+        }
+        
+        Assert.That(reader.FieldCount, Is.GreaterThanOrEqualTo(10));
+    }
+
     public void GitIssue541BuiltinFormat55IsDate()
     {
         using var reader = OpenReader("Test_git_issue_541");

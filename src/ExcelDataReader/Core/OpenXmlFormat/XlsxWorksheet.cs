@@ -6,7 +6,7 @@ namespace ExcelDataReader.Core.OpenXmlFormat;
 
 internal sealed class XlsxWorksheet : IWorksheet
 {
-    public XlsxWorksheet(ZipWorker document, XlsxWorkbook workbook, SheetRecord refSheet)
+    public XlsxWorksheet(ZipWorker document, XlsxWorkbook workbook, SheetRecord refSheet, bool singlePassMode = false)
     {
         Document = document;
         Workbook = workbook;
@@ -19,8 +19,8 @@ internal sealed class XlsxWorksheet : IWorksheet
         if (string.IsNullOrEmpty(Path))
             return;
 
-        using var sheetStream = Document.GetWorksheetReader(Path, true);
-
+        using var sheetStream = Document.GetWorksheetReader(Path, !singlePassMode);
+        
         if (sheetStream == null)
             return;
 
@@ -30,24 +30,23 @@ internal sealed class XlsxWorksheet : IWorksheet
         List<Column> columnWidths = [];
         List<CellRange> cellRanges = [];
 
-        bool inSheetData = false;
+        bool stop = false;
 
-        while (sheetStream.Read() is { } record)
+        while (!stop && sheetStream.Read() is { } record)
         {
             switch (record)
             {
-                case SheetDataBeginRecord _:
-                    inSheetData = true;
+                case SheetDimRecord dimRecord:
+                    Dimension = dimRecord.Range;
                     break;
-                case SheetDataEndRecord _:
-                    inSheetData = false;
+                case SheetDataBeginRecord _ when singlePassMode:
+                    // In single-pass mode stop before reading cells; ReadRows() will be the only pass
+                    stop = true;
                     break;
-                case RowHeaderRecord row when inSheetData:
-                    rowIndexMaximum = Math.Max(rowIndexMaximum, row.RowIndex);
-                    break;
-                case CellRecord cell when inSheetData:
-                    if (cell.Value != null || cell.Error != null)
-                        columnIndexMaximum = Math.Max(columnIndexMaximum, cell.ColumnIndex);
+                case ScanResultRecord scan:
+                    // Multi-pass: sheetData was scanned without allocating per-cell records
+                    rowIndexMaximum = Math.Max(rowIndexMaximum, scan.MaxRowIndex);
+                    columnIndexMaximum = Math.Max(columnIndexMaximum, scan.MaxColumnIndex);
                     break;
                 case ColumnRecord column:
                     columnWidths.Add(column.Column);
@@ -65,16 +64,18 @@ internal sealed class XlsxWorksheet : IWorksheet
                 case HeaderFooterRecord headerFooter:
                     HeaderFooter = headerFooter.HeaderFooter;
                     break;
-                case SheetDimRecord dimRecord:
-                    Dimension = dimRecord.Range;
-                    break;
             }
         }
 
         ColumnWidths = columnWidths;
         MergeCells = [.. cellRanges];
 
-        if (rowIndexMaximum != int.MinValue && columnIndexMaximum != int.MinValue)
+        if (singlePassMode)
+        {
+            // In single-pass mode FieldCount comes from the dimension hint only (may be 0 if absent)
+            FieldCount = columnIndexMaximum != int.MinValue ? columnIndexMaximum + 1 : 0;
+        }
+        else if (rowIndexMaximum != int.MinValue && columnIndexMaximum != int.MinValue)
         {
             FieldCount = columnIndexMaximum + 1;
             RowCount = rowIndexMaximum + 1;

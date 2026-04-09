@@ -5,10 +5,12 @@ namespace ExcelDataReader;
 
 internal sealed class ExcelOpenXmlReader : ExcelDataReader<XlsxWorkbook, XlsxWorksheet>
 {
-    public ExcelOpenXmlReader(Stream stream, CultureInfo culture = null)
+    public ExcelOpenXmlReader(Stream stream, CultureInfo culture = null, bool singlePassMode = false)
     {
         Document = new(stream);
         Workbook = new XlsxWorkbook(Document);
+        Workbook.SinglePassMode = singlePassMode;
+        SinglePassMode = singlePassMode;
         Workbook.Culture = culture;
 
         // By default, the data reader is positioned on the first result.

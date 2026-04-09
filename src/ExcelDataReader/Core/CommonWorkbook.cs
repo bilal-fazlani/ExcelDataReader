@@ -26,6 +26,8 @@ internal class CommonWorkbook
     /// </summary>
     public List<ExtendedFormat> CellStyleExtendedFormats { get; } = [];
 
+    public bool SinglePassMode { get; set; }
+  
     /// <summary>
     /// Gets or sets the culture to use for locale-dependent built-in number format indices.
     /// When null (the default), hardcoded format strings are used.
