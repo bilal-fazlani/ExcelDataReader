@@ -85,13 +85,6 @@ internal class XlsBiffRecord
         return BitConverter.ToInt64(Bytes, ContentOffset + offset);
     }
 
-    public byte[] ReadArray(int offset, int size)
-    {
-        byte[] tmp = new byte[size];
-        Buffer.BlockCopy(Bytes, ContentOffset + offset, tmp, 0, size);
-        return tmp;
-    }
-
     public float ReadFloat(int offset)
     {
         return BitConverter.ToSingle(Bytes, ContentOffset + offset);

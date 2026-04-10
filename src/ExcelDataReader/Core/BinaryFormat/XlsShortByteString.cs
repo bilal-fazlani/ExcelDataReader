@@ -12,14 +12,6 @@ internal sealed class XlsShortByteString(byte[] bytes, uint offset) : IXlsString
 
     public ushort CharacterCount => _bytes[_offset];
 
-    public string GetValue(Encoding encoding)
-    {
-        // Supposedly this is never multibyte, but technically could be
-        if (!Helpers.IsSingleByteEncoding(encoding))
-        {
-            return encoding.GetString(_bytes, (int)_offset + 1, CharacterCount * 2);
-        }
-
-        return encoding.GetString(_bytes, (int)_offset + 1, CharacterCount);
-    }
+    public string GetValue(Encoding encoding) =>
+        encoding.GetString(_bytes, (int)_offset + 1, CharacterCount * (Helpers.IsSingleByteEncoding(encoding) ? 1 : 2));
 }

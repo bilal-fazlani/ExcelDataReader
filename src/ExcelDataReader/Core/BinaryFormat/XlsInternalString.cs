@@ -7,10 +7,5 @@ namespace ExcelDataReader.Core.BinaryFormat;
 /// </summary>
 internal sealed class XlsInternalString(string value) : IXlsString
 {
-    private readonly string stringValue = value;
-
-    public string GetValue(Encoding encoding)
-    {
-        return stringValue;
-    }
+    public string GetValue(Encoding encoding) => value;
 }

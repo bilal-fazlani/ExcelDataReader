@@ -256,25 +256,13 @@ internal sealed class XlsBiffStream : IDisposable
             case BIFFRECORDTYPE.WINDOW1:
                 return new XlsBiffWindow1(bytes);
             case BIFFRECORDTYPE.CODEPAGE:
-                return new XlsBiffSimpleValueRecord(bytes);
             case BIFFRECORDTYPE.FNGROUPCOUNT:
-                return new XlsBiffSimpleValueRecord(bytes);
             case BIFFRECORDTYPE.DATE1904:
-                return new XlsBiffSimpleValueRecord(bytes);
             case BIFFRECORDTYPE.BOOKBOOL:
-                return new XlsBiffSimpleValueRecord(bytes);
             case BIFFRECORDTYPE.BACKUP:
-                return new XlsBiffSimpleValueRecord(bytes);
             case BIFFRECORDTYPE.HIDEOBJ:
-                return new XlsBiffSimpleValueRecord(bytes);
             case BIFFRECORDTYPE.USESELFS:
                 return new XlsBiffSimpleValueRecord(bytes);
-            case BIFFRECORDTYPE.UNCALCED:
-                return new XlsBiffUncalced(bytes);
-            case BIFFRECORDTYPE.QUICKTIP:
-                return new XlsBiffQuickTip(bytes);
-            case BIFFRECORDTYPE.MSODRAWING:
-                return new XlsBiffMSODrawing(bytes);
             case BIFFRECORDTYPE.FILEPASS:
                 return new XlsBiffFilePass(bytes, biffVersion);
             case BIFFRECORDTYPE.HEADER:
