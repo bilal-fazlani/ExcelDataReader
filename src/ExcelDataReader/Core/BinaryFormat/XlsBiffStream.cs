@@ -219,7 +219,7 @@ internal sealed class XlsBiffStream : IDisposable
             case BIFFRECORDTYPE.BLANK_OLD:
                 return new XlsBiffBlankCell(bytes);
             case BIFFRECORDTYPE.MULBLANK:
-                return new XlsBiffMulBlankCell(bytes);
+                return new XlsBiffBlankCell(bytes);
             case BIFFRECORDTYPE.LABEL_V2:
             case BIFFRECORDTYPE.LABEL:
             case BIFFRECORDTYPE.RSTRING:
@@ -254,7 +254,7 @@ internal sealed class XlsBiffStream : IDisposable
             case BIFFRECORDTYPE.BOUNDSHEET:
                 return new XlsBiffBoundSheet(bytes, biffVersion);
             case BIFFRECORDTYPE.WINDOW1:
-                return new XlsBiffWindow1(bytes);
+                return new XlsBiffRecord(bytes);
             case BIFFRECORDTYPE.CODEPAGE:
             case BIFFRECORDTYPE.FNGROUPCOUNT:
             case BIFFRECORDTYPE.DATE1904:
