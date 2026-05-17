@@ -124,6 +124,10 @@ var reader = ExcelReaderFactory.CreateReader(stream, new ExcelReaderConfiguratio
     // (CSV only)
     AutodetectSeparators = new char[] { ',', ';', '\t', '|', '#' },
 
+    // Gets or sets the quote character for CSV. Default: "
+    // (CSV only)
+    QuoteChar = '"',
+
     // Gets or sets a value indicating whether to trim white space values for CSV (Default 'true').
     // (CSV only)
     TrimWhiteSpace = true,
@@ -139,12 +143,12 @@ var reader = ExcelReaderFactory.CreateReader(stream, new ExcelReaderConfiguratio
     // formats)
     AnalyzeInitialCsvRows = 0,
 
-    // Gets or sets the culture to use when mapping locale-dependent built-in
-    // number format indices to format strings. Affects indices 14 (short date)
-    // and 22 (short date and time). When null (the default), hardcoded format
-    // strings are used for backward compatibility.
+    // Gets or sets a value indicating whether to skip the initial full-scan
+    // pass used to determine FieldCount and RowCount. When true, RowCount
+    // throws InvalidOperationException and FieldCount grows dynamically as
+    // rows are read. Default: false
     // (XLS and XLSX/XLSB only, has no effect on CSV)
-    Culture = CultureInfo.CurrentCulture,
+    SinglePassMode = false,
 });
 ```
 
@@ -166,6 +170,10 @@ var result = reader.AsDataSet(new ExcelDataSetConfiguration()
     // Gets or sets a callback to obtain configuration options for a DataTable. 
     ConfigureDataTable = (tableReader) => new ExcelDataTableConfiguration()
     {
+        // Gets or sets a value indicating whether the DataTable should be case
+        // sensitive. Useful when setting a primary key after loading from Excel.
+        CaseSensitive = false,
+
         // Gets or sets a value indicating the prefix of generated column names.
         EmptyColumnNamePrefix = "Column",
 
@@ -217,7 +225,9 @@ var result = reader.AsDataSet(new ExcelDataSetConfiguration()
 
 ## Formatting
 
-ExcelDataReader does not support formatting directly. Users may retreive the number format string for a cell through `IExcelDataReader.GetNumberFormatString(i)` and use the third party ExcelNumberFormat library for formatting purposes.
+ExcelDataReader does not support formatting directly. Users may retrieve the number format string for a cell through `IExcelDataReader.GetNumberFormatString(i)` and use the third party ExcelNumberFormat library for formatting purposes.
+
+`GetNumberFormatString(i)` returns Excel's original locale-independent built-in format strings. To get locale-specific date and time format strings for built-in number format indices 14–17 and 22, use the overload `GetNumberFormatString(i, provider)` with a `CultureInfo` or `DateTimeFormatInfo`. Passing `null` is equivalent to calling the no-argument overload.
 
 Example helper method using ExcelDataReader and ExcelNumberFormat to format a value:
 
@@ -225,7 +235,7 @@ Example helper method using ExcelDataReader and ExcelNumberFormat to format a va
 string GetFormattedValue(IExcelDataReader reader, int columnIndex, CultureInfo culture)
 {
     var value = reader.GetValue(columnIndex);
-    var formatString = reader.GetNumberFormatString(columnIndex);
+    var formatString = reader.GetNumberFormatString(columnIndex, culture);
     if (formatString != null)
     {
         var format = new NumberFormat(formatString);
