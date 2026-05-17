@@ -1,13 +1,13 @@
-﻿using System.Data;
+using System.Data;
 
 namespace ExcelDataReader.Tests;
 
 public class ExcelOpenXmlStrictReaderTest : ExcelOpenXmlReaderBase
 {
-    protected override DateTime GitIssue82TodayDate => new(2013, 4, 19);
+    protected override DateTime Issue82_TodayDate => new(2013, 4, 19);
 
-    [TestCase("Test_git_issue_498")]
-    public void GitIssue498ReadStrictOpenXmlExcelFile(string fileName)
+    [TestCase("Issue498")]
+    public void Issue498_ReadStrictOpenXmlExcelFile(string fileName)
     {
         using IExcelDataReader reader = OpenReader(fileName);
         DataTableCollection tables = reader.AsDataSet().Tables;

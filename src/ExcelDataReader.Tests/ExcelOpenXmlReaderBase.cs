@@ -1,15 +1,15 @@
-﻿using System.Data;
+using System.Data;
 
 namespace ExcelDataReader.Tests;
 
 public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
 {
     [Test]
-    public void GitIssue525_XlsxSstPreallocationReturnsCorrectStrings()
+    public void Issue525_XlsxSstPreallocationReturnsCorrectStrings()
     {
         // Verify that pre-allocating XlsxSST based on uniqueCount doesn't break SST string resolution.
         // XlsxWorkbook.ReadSharedStrings() sets SST.Capacity = uniqueCount from <sst uniqueCount="...">
-        using var reader = OpenReader("Test10x10");
+        using var reader = OpenReader("10x10");
         reader.Read();
         Assert.That(reader.GetString(0), Is.EqualTo("col1"));
         Assert.That(reader.GetString(4), Is.EqualTo("col5"));
@@ -20,9 +20,9 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue14InvalidOADate()
+    public void Issue14_InvalidOADate()
     {
-        using var excelReader = ExcelReaderFactory.CreateOpenXmlReader(Configuration.GetTestWorkbook("Test_git_issue_14_InvalidOADate.xlsx"));
+        using var excelReader = ExcelReaderFactory.CreateOpenXmlReader(Configuration.GetTestWorkbook("Issue14_InvalidOADate.xlsx"));
         var dataSet = excelReader.AsDataSet();
 
         // Test out of range double formatted as date returns double
@@ -30,9 +30,9 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue364()
+    public void Issue364()
     {
-        using var reader = OpenReader("test_git_issue_364");
+        using var reader = OpenReader("Issue364");
         Assert.That(reader.RowCount, Is.EqualTo(1));
         reader.Read();
 
@@ -43,9 +43,9 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     }
 
     [Test]
-    public void Issue11516WorkbookWithSingleSheetShouldNotReturnEmptyDataset()
+    public void Issue11516_WorkbookWithSingleSheetShouldNotReturnEmptyDataset()
     {
-        using IExcelDataReader reader = OpenReader("Test_Issue_11516_Single_Tab");
+        using IExcelDataReader reader = OpenReader("OldIssue11516_SingleTab");
         Assert.That(reader.ResultsCount, Is.EqualTo(1));
 
         DataSet dataSet = reader.AsDataSet();
@@ -57,9 +57,9 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue241FirstOddEven()
+    public void Issue241_FirstOddEven()
     {
-        using var reader = OpenReader("Test_git_issue_224_firstoddeven");
+        using var reader = OpenReader("Issue224_Firstoddeven");
         Assert.That(reader.HeaderFooter, Is.Not.Null);
 
         Assert.That(reader.HeaderFooter?.HasDifferentFirst, Is.True, "HasDifferentFirst");
@@ -76,7 +76,7 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     [TestCase("standard_AES128_SHA1_ECB_pwd_password", Description = "OpenXml standard encryption aes128+sha1")]
     [TestCase("standard_AES192_SHA1_ECB_pwd_password", Description = "OpenXml standard encryption aes192+sha1")]
     [TestCase("standard_AES256_SHA1_ECB_pwd_password", Description = "OpenXml standard encryption aes256+sha1")]
-    public void GitIssue242StandardEncryption(string file)
+    public void Issue242_StandardEncryption(string file)
     {
         using var reader = OpenReader(
             OpenStream(file),
@@ -94,7 +94,7 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     [TestCase("agile_DESede_SHA384_CBC_pwd_password")]
     [TestCase("agile_DES_MD5_CBC_pwd_password")]
     [TestCase("agile_RC2_SHA1_CBC_pwd_password")]
-    public void GitIssue242AgileEncryption(string file)
+    public void Issue242_AgileEncryption(string file)
     {
         // OpenXml agile encryption aes128+md5+cbc
         using var reader = OpenReader(
@@ -136,10 +136,10 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
         });
     }
 
-    [TestCase("Test10x10", null, Description = "Verify the file stream is closed and disposed by the reader")]
+    [TestCase("10x10", null, Description = "Verify the file stream is closed and disposed by the reader")]
     [TestCase("standard_AES128_SHA1_ECB_pwd_password", "password", Description = "Verify streams used by standard encryption are closed")]
     [TestCase("agile_AES128_MD5_CBC_pwd_password", "password", Description = "Verify streams used by agile encryption are closed")]
-    public void GitIssue265OpenXmlDisposed(string file, string password)
+    public void Issue265_OpenXmlDisposed(string file, string password)
     {
         var stream = OpenStream(file);
 
@@ -154,7 +154,7 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue_341_Indent()
+    public void Issue_341_Indent()
     {
         int[][] expected =
         {
@@ -166,7 +166,7 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
         };
 
         int index = 0;
-        using var reader = OpenReader("Test_git_issue_341");
+        using var reader = OpenReader("Issue341");
         while (reader.Read())
         {
             int[] expectedRow = expected[index];
@@ -183,7 +183,7 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue_341_HorizontalAlignment()
+    public void Issue_341_HorizontalAlignment()
     {
         HorizontalAlignment[][] expected =
         {
@@ -195,7 +195,7 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
         };
 
         int index = 0;
-        using var reader = OpenReader("Test_git_issue_341");
+        using var reader = OpenReader("Issue341");
         while (reader.Read())
         {
             HorizontalAlignment[] expectedRow = expected[index];
@@ -212,9 +212,9 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue578()
+    public void Issue578()
     {
-        using var reader = OpenReader("Test_git_issue578");
+        using var reader = OpenReader("Issue578");
 
         reader.Read();
         var values = new object[reader.FieldCount];
@@ -230,9 +230,9 @@ public abstract class ExcelOpenXmlReaderBase : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue682()
+    public void Issue682()
     {
-        using var reader = OpenReader("Test_git_issue682");
+        using var reader = OpenReader("Issue682");
         reader.Read();
         var values = new object[reader.FieldCount];
         reader.GetValues(values);

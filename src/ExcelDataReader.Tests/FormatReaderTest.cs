@@ -489,7 +489,7 @@ public class FormatReaderTest
     }
 
     [Test]
-    public void GitIssue541LocaleFormatStringsDetectedAsDate()
+    public void Issue541_LocaleFormatStringsDetectedAsDate()
     {
         // Locale-specific format strings containing unquoted CJK / Thai characters
         // should be detected as date/time after the implicit-literal parser fix.
@@ -511,7 +511,7 @@ public class FormatReaderTest
     }
 
     [Test]
-    public void GitIssue541BuiltinFormatIndicesDetectedAsDate()
+    public void Issue541_BuiltinFormatIndicesDetectedAsDate()
     {
         // Verify that the representative format strings stored for locale-specific built-in
         // indices are each detected as date/time (i.e. IsDateTimeFormat = true).
@@ -564,7 +564,7 @@ public class FormatReaderTest
     /// recognise as date values rather than raw doubles.
     /// </summary>
     [Test]
-    public void GitIssue461_CultureDerivedFormatStringsAreValidDateFormats()
+    public void Issue461_CultureDerivedFormatStringsAreValidDateFormats()
     {
         // Expected outputs of DatePatternToExcel / TimePatternToExcel for common locales
         Assert.That(IsDateFormatString("m/d/yyyy"), Is.True, "en-US short date (format 14)");

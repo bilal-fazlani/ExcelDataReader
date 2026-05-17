@@ -4,20 +4,20 @@ namespace ExcelDataReader.Tests;
 public class ExcelOpenXmlBinaryReaderTest : ExcelOpenXmlReaderBase
 {
     /// <inheritdoc />
-    protected override DateTime GitIssue82TodayDate => new(2013, 4, 19);
+    protected override DateTime Issue82_TodayDate => new(2013, 4, 19);
 
     [Test]
-    public void GitIssue635()
+    public void Issue635()
     {
-        using var reader = OpenReader("Test_git_issue_635");
+        using var reader = OpenReader("Issue635");
         var dataSet = reader.AsDataSet();
         Assert.That(dataSet.Tables[0].Rows[0].ItemArray, Is.EqualTo(new[] { "A", "B", "C", "D", "E", "F" }));
     }
 
     [Test]
-    public void GitIssue642_ActiveSheet()
+    public void Issue642_ActiveSheet()
     {
-        using var reader = OpenReader("Test_git_issue_642");
+        using var reader = OpenReader("Issue642");
         var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration()
         {
             FilterSheet = (tableReader, sheetIndex) => tableReader.IsActiveSheet
@@ -27,9 +27,9 @@ public class ExcelOpenXmlBinaryReaderTest : ExcelOpenXmlReaderBase
     }
 
     [Test]
-    public void GitIssue642_ActiveSheet_SingleWorksheet()
+    public void Issue642_ActiveSheet_SingleWorksheet()
     {
-        using var reader = OpenReader("Test_git_issue_642onesheet");
+        using var reader = OpenReader("Issue642_Onesheet");
         var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration()
         {
             FilterSheet = (tableReader, sheetIndex) => tableReader.IsActiveSheet
@@ -41,7 +41,7 @@ public class ExcelOpenXmlBinaryReaderTest : ExcelOpenXmlReaderBase
     [Test]
     public void ClipboardDimension()
     {
-        using var excelReader = OpenReader("Test_Clipboard_Biff12");
+        using var excelReader = OpenReader("ClipboardBiff12");
 
         Assert.That(excelReader.Dimension.FromRow, Is.EqualTo(10));
         Assert.That(excelReader.Dimension.ToRow, Is.EqualTo(11));

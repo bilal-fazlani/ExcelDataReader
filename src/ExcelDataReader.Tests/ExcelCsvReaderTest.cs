@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace ExcelDataReader.Tests;
 
@@ -247,7 +247,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue323DoubleClose()
+    public void Issue323_DoubleClose()
     {
         using var reader = ExcelReaderFactory.CreateCsvReader(Configuration.GetTestWorkbook(Path.Combine("csv", "MOCK_DATA.csv")));
         reader.Read();
@@ -255,7 +255,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue333EanQuotes()
+    public void Issue333_EanQuotes()
     {
         using var reader = ExcelReaderFactory.CreateCsvReader(Configuration.GetTestWorkbook(Path.Combine("csv", "ean.txt")));
         reader.Read();
@@ -264,7 +264,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue351LastLineWithoutLineFeed()
+    public void Issue351_LastLineWithoutLineFeed()
     {
         using var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, Encoding.UTF8);
@@ -351,9 +351,9 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue578()
+    public void Issue578()
     {
-        var stream = Configuration.GetTestWorkbook(Path.Combine("csv", "Test_git_issue578.csv"));
+        var stream = Configuration.GetTestWorkbook(Path.Combine("csv", "Issue578.csv"));
         using IExcelDataReader excelReader = ExcelReaderFactory.CreateCsvReader(stream, new ExcelReaderConfiguration());
         excelReader.Read();
         var values = new object[excelReader.FieldCount];
@@ -369,7 +369,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue500()
+    public void Issue500()
     {
         const string data = """
             Item_Number,Pmt_Amount,Type,Voided,Note
@@ -393,7 +393,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue500_QuotedValueWithNewLine()
+    public void Issue500_QuotedValueWithNewLine()
     {
         const string data = """
             Item_Number,Pmt_Amount,"Type
@@ -429,7 +429,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue463()
+    public void Issue463()
     {
 #pragma warning disable SA1027 // TabsMustNotBeUsed
         const string data = """
@@ -465,7 +465,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue642_ActiveSheet()
+    public void Issue642_ActiveSheet()
     {
         using var reader = ExcelReaderFactory.CreateCsvReader(Configuration.GetTestWorkbook(Path.Combine("csv", "MOCK_DATA.csv")));
         var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration()
@@ -477,7 +477,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue580_ReadCsvWithoutQuoteChar()
+    public void Issue580_ReadCsvWithoutQuoteChar()
     {
 #pragma warning disable SA1027 // TabsMustNotBeUsed
         const string data = """
@@ -516,7 +516,7 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue580_ReadCsvWithCustomQuoteChar()
+    public void Issue580_ReadCsvWithCustomQuoteChar()
     {
 #pragma warning disable SA1027 // TabsMustNotBeUsed
         const string data = """
@@ -555,14 +555,14 @@ public class ExcelCsvReaderTest
     }
 
     [Test]
-    public void GitIssue566_ParseCsvWithoutTrimmingWhiteSpace()
+    public void Issue566_ParseCsvWithoutTrimmingWhiteSpace()
     {
         var keepSpaceConfig = new ExcelReaderConfiguration
         {
             TrimWhiteSpace = false,
         };
 
-        using var excelReader = ExcelReaderFactory.CreateCsvReader(Configuration.GetTestWorkbook(Path.Combine("csv", "test_issue_566.csv")), keepSpaceConfig);
+        using var excelReader = ExcelReaderFactory.CreateCsvReader(Configuration.GetTestWorkbook(Path.Combine("csv", "Issue566.csv")), keepSpaceConfig);
 
         var ds = excelReader.AsDataSet();
         Assert.That(ds.Tables[0].Rows[0][0], Is.EqualTo("c1"));

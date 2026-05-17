@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using ExcelDataReader.Exceptions;
 
 namespace ExcelDataReader.Tests;
@@ -6,12 +6,12 @@ namespace ExcelDataReader.Tests;
 public class ExcelBinaryReaderTest : ExcelTestBase
 {
     /// <inheritdoc />
-    protected override DateTime GitIssue82TodayDate => new(2009, 6, 28);
+    protected override DateTime Issue82_TodayDate => new(2009, 6, 28);
 
     [Test]
-    public void GitIssue70ExcelBinaryReaderTryConvertOADateTimeFormula()
+    public void Issue70_ExcelBinaryReaderTryConvertOADateTimeFormula()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_70_ExcelBinaryReader_tryConvertOADateTime _convert_dates.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue70_ExcelBinaryReaderTryConvertOADateTimeConvertDates.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds, Is.Not.Null);
 
@@ -21,9 +21,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue51ReadCellLabel()
+    public void Issue51_ReadCellLabel()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Git_Issue_51.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue51.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds, Is.Not.Null);
 
@@ -33,9 +33,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue45()
+    public void Issue45()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_45.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue45.xls"));
         do
         {
             while (reader.Read())
@@ -46,7 +46,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void Issue1155311570FatIssueOffset()
+    public void Issue1155311570_FatIssueOffset()
     {
         void DoTestFatStreamIssue(string sheetId)
         {
@@ -76,9 +76,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
             Assert.DoesNotThrow(() => excelReader.AsDataSet(Configuration.FirstRowColumnNamesConfiguration));
         }
 
-        DoTestFatStreamIssue("Test_Issue_11553_FAT.xls");
-        DoTestFatStreamIssueType2("Test_Issue_11570_FAT_1.xls");
-        DoTestFatStreamIssueType2("Test_Issue_11570_FAT_2.xls");
+        DoTestFatStreamIssue("OldIssue11553_FAT.xls");
+        DoTestFatStreamIssueType2("OldIssue11570_FAT1.xls");
+        DoTestFatStreamIssueType2("OldIssue11570_FAT2.xls");
     }
 
     /*[Test]
@@ -94,7 +94,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     {
         var exception = Assert.Throws<HeaderException>(() =>
         {
-            using (ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("TestFail_Binary.xls")))
+            using (ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("FailBinary.xls")))
             {
             }
         });
@@ -103,9 +103,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void TestOpenOffice()
+    public void OpenOffice()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_OpenOffice.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("OpenOffice.xls"));
         AssertUtilities.DoOpenOfficeTest(excelReader);
     }
 
@@ -113,9 +113,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     /// Issue 11 - OpenOffice files were skipping the first row if IsFirstRowAsColumnNames = false.
     /// </summary>
     [Test]
-    public void GitIssue11OpenOfficeRowCount()
+    public void Issue11_OpenOfficeRowCount()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_OpenOffice.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("OpenOffice.xls"));
         var dataSet = excelReader.AsDataSet(Configuration.NoColumnNamesConfiguration);
         Assert.That(dataSet.Tables[0].Rows.Count, Is.EqualTo(34));
     }
@@ -136,9 +136,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void Issue11570Excel2013()
+    public void Issue11570_Excel2013()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Issue_11570_Excel2013.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("OldIssue11570_Excel2013.xls"));
         var dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Columns.Count, Is.EqualTo(2));
@@ -161,11 +161,11 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void Issue11572CodePage()
+    public void Issue11572_CodePage()
     {
         // This test was skipped for a long time as it produced: "System.NotSupportedException : No data is available for encoding 27651."
         // Upon revisiting the underlying cause appears to be fixed
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Issue_11572_CodePage.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("OldIssue11572_CodePage.xls"));
         Assert.DoesNotThrow(() => excelReader.AsDataSet());
     }
 
@@ -173,9 +173,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     /// Not fixed yet.
     /// </summary>
     [Test]
-    public void Issue11545NoIndex()
+    public void Issue11545_NoIndex()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Issue_11545_NoIndex.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("OldIssue11545_NoIndex.xls"));
         var dataSet = excelReader.AsDataSet(Configuration.FirstRowColumnNamesConfiguration);
 
         Assert.That(dataSet.Tables[0].Rows[0][0], Is.EqualTo("CI2229         "));
@@ -184,10 +184,10 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void Issue11642ValuesNotLoaded()
+    public void Issue11642_ValuesNotLoaded()
     {
         // Excel.Log.Log.InitializeWith<Log4NetLog>();
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Issue_11642_ValuesNotLoaded.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("OldIssue11642_ValuesNotLoaded.xls"));
         var dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[2].Rows[29][1].ToString(), Is.EqualTo("431113*"));
@@ -196,9 +196,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void Issue11636BiffStream()
+    public void Issue11636_BiffStream()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Issue_11636_BiffStream.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("OldIssue11636_BiffStream.xls"));
         var dataSet = excelReader.AsDataSet();
 
         // check a couple of values
@@ -215,10 +215,10 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     /// </summary>
     [Test]
     [Ignore("Not fixed yet")]
-    public void Issue1163911644ForwardOnlyStream()
+    public void Issue1163911644_ForwardOnlyStream()
     {
         // Excel.Log.Log.InitializeWith<Log4NetLog>();
-        using var stream = Configuration.GetTestWorkbook("Test_OpenOffice");
+        using var stream = Configuration.GetTestWorkbook("OpenOffice");
         using var forwardStream = SeekErrorMemoryStream.CreateFromStream(stream);
         using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(forwardStream);
         Assert.DoesNotThrow(() => excelReader.AsDataSet());
@@ -231,12 +231,12 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     /// which is probably not good for performance.
     /// </summary>
     [Test]
-    public void Issue12556Corrupt()
+    public void Issue12556_Corrupt()
     {
         Assert.Throws<CompoundDocumentException>(() =>
         {
             // Excel.Log.Log.InitializeWith<Log4NetLog>();
-            using var forwardStream = Configuration.GetTestWorkbook("Test_Issue_12556_corrupt.xls");
+            using var forwardStream = Configuration.GetTestWorkbook("OldIssue12556_Corrupt.xls");
             using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(forwardStream);
             Assert.DoesNotThrow(() => excelReader.AsDataSet());
         });
@@ -246,18 +246,18 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     /// Some spreadsheets were crashing with index out of range error (from SSRS).
     /// </summary>
     [Test]
-    public void TestIssue11818OutOfRange()
+    public void TestIssue11818_OutOfRange()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Issue_11818_OutOfRange.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("OldIssue11818_OutOfRange.xls"));
         var dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[10][0], Is.EqualTo("Total Revenue"));
     }
 
     [Test]
-    public void TestIssue111NoRowRecords()
+    public void TestIssue111_NoRowRecords()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_111_NoRowRecords.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue111_NoRowRecords.xls"));
         var dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables.Count, Is.EqualTo(1));
@@ -268,9 +268,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void TestGitIssue145()
+    public void Issue145()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Git_Issue_145.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue145.xls"));
         excelReader.Read();
         excelReader.Read();
         excelReader.Read();
@@ -281,27 +281,27 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void TestGitIssue152SheetNameUtf16LeCompressed()
+    public void Issue152_SheetNameUtf16LeCompressed()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_152.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue152.xls"));
         var dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].TableName, Is.EqualTo("åäöñ"));
     }
 
     [Test]
-    public void TestGitIssue152CellUtf16LeCompressed()
+    public void Issue152_CellUtf16LeCompressed()
     {
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_152.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue152.xls"));
         var dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[0][0], Is.EqualTo("åäöñ"));
     }
 
     [Test]
-    public void GitIssue158()
+    public void Issue158()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_158.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue158.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds, Is.Not.Null);
 
@@ -311,9 +311,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue173()
+    public void Issue173()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_173.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue173.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds, Is.Not.Null);
         Assert.That(ds.Tables.Count, Is.EqualTo(40));
@@ -332,7 +332,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     [Test]
     public void TestIncludeTableWithOnlyImage()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("TestTableOnlyImage_x01oct2016.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("TableOnlyImageX01oct2016.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds, Is.Not.Null);
         Assert.That(ds.Tables.Count, Is.EqualTo(4));
@@ -341,7 +341,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     [Test]
     public void AllowFfffAsByteOrder()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_InvalidByteOrderValueInHeader.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("InvalidByteOrderValueInHeader.xls"));
         int tableCount = 0;
         do
         {
@@ -385,7 +385,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         // bits off the dimensions' LastColumn in BIFF8 files and relied
         // on scanning to come up with 6 columns. The test was changed to
         // assume valid dimensions:
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Git_Issue_145.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue145.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds.Tables[0].Columns.Count, Is.EqualTo(5));
     }
@@ -393,7 +393,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     [Test]
     public void Row1217NotRead()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Row1217NotRead.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Row1217NotRead.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(
             ds.Tables[0].Rows[1216].ItemArray, 
@@ -432,16 +432,16 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [TestCase]
-    public void GitIssue5()
+    public void Issue5()
     {
-        using var stream = Configuration.GetTestWorkbook("Test_git_issue_5.xls");
+        using var stream = Configuration.GetTestWorkbook("Issue5.xls");
         Assert.Throws<CompoundDocumentException>(() => ExcelReaderFactory.CreateBinaryReader(stream));
     }
 
     [TestCase]
-    public void Issue2InvalidDimensionRecord()
+    public void Issue2_InvalidDimensionRecord()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_2.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue2.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds.Tables[0].Rows[0].ItemArray, Is.EqualTo(new[] { "A1", "B1" }));
     }
@@ -455,10 +455,10 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [TestCase]
-    public void GitIssue184AdditionalFatSectors()
+    public void Issue184_AdditionalFatSectors()
     {
         // Big spreadsheets have additional sectors beyond the header with FAT contents
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("GitIssue_184_FATSectors.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue184_FATSectors.xls"));
         DataSet ds = null;
         Assert.DoesNotThrow(() => ds = excelReader.AsDataSet());
         Assert.That(ds.Tables.Count, Is.EqualTo(12));
@@ -469,15 +469,15 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     [Test]
     public void RowContentSpreadOverMultipleBlocks()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_217.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue217.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds.Tables[2].Rows[10].ItemArray, Is.EqualTo(new object[] { "REX GESAMT      ", 484.7929, 142.1032, -0.1656, 5.0315225293000001, 5.0398685515999997, 37.5344725251 }).AsCollection);
     }
 
     [Test]
-    public void GitIssue231NoCodePage()
+    public void Issue231_NoCodePage()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_231_NoCodePage.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue231_NoCodePage.xls"));
         var ds = excelReader.AsDataSet();
         Assert.That(ds.Tables[0].Columns.Count, Is.EqualTo(11));
         Assert.That(ds.Tables[0].Rows.Count, Is.EqualTo(5));
@@ -516,11 +516,11 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue240ExceptionBeforeRead()
+    public void Issue240_ExceptionBeforeRead()
     {
         // Check the exception and message when trying to get data before calling Read().
         // Using the same as SqlDataReader, making it easier to search for a general solution.
-        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test10x10.xls"));
+        using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("10x10.xls"));
         var exception = Assert.Throws<InvalidOperationException>(() =>
         {
             for (int columnIndex = 0; columnIndex < excelReader.FieldCount; columnIndex++)
@@ -533,26 +533,26 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue241Simple95()
+    public void Issue241_Simple95()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_224_simple_95.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue224_Simple95.xls"));
         Assert.That(reader.HeaderFooter?.OddHeader, Is.EqualTo("&LLeft åäö &T&CCenter åäö &D&RRight  åäö &P"), "Header");
         Assert.That(reader.HeaderFooter?.OddFooter, Is.EqualTo("&LLeft åäö &P&CFooter åäö &P&RRight åäö &D"), "Footer");
     }
 
     [Test]
-    public void GitIssue245CodeNameHoja8()
+    public void Issue245_CodeNameHoja8()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_45.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue45.xls"));
         Assert.That(reader.CodeName, Is.EqualTo("Hoja8"));
     }
     
     [Test]
-    public void GitIssue242Password()
+    public void Issue242_Password()
     {
         // BIFF8 standard encryption cryptoapi rc4+sha 
         using (var reader = ExcelReaderFactory.CreateBinaryReader(
-            Configuration.GetTestWorkbook("Test_git_issue_242_std_rc4_pwd_password.xls"),
+            Configuration.GetTestWorkbook("Issue242_StdRc4PwdPassword.xls"),
             new ExcelReaderConfiguration { Password = "password" }))
         {
             reader.Read();
@@ -561,7 +561,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
 
         // Pre-BIFF8 xor obfuscation
         using (var reader = ExcelReaderFactory.CreateBinaryReader(
-            Configuration.GetTestWorkbook("Test_git_issue_242_xor_pwd_password.xls"),
+            Configuration.GetTestWorkbook("Issue242_XorPwdPassword.xls"),
             new ExcelReaderConfiguration { Password = "password" }))
         {
             reader.Read();
@@ -575,7 +575,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         Assert.Throws<InvalidPasswordException>(() =>
         {
             using var reader = ExcelReaderFactory.CreateBinaryReader(
-                Configuration.GetTestWorkbook("Test_git_issue_242_xor_pwd_password.xls"),
+                Configuration.GetTestWorkbook("Issue242_XorPwdPassword.xls"),
                 new ExcelReaderConfiguration { Password = "wrongpassword" });
             reader.Read();
         });
@@ -583,23 +583,23 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         Assert.Throws<InvalidPasswordException>(() =>
         {
             using var reader = ExcelReaderFactory.CreateBinaryReader(
-                Configuration.GetTestWorkbook("Test_git_issue_242_xor_pwd_password.xls"));
+                Configuration.GetTestWorkbook("Issue242_XorPwdPassword.xls"));
             reader.Read();
         });
     }
 
     [Test]
-    public void GitIssue263()
+    public void Issue263()
     {
-        using var reader = ExcelReaderFactory.CreateReader(Configuration.GetTestWorkbook("Test_git_issue_263.xls"));
+        using var reader = ExcelReaderFactory.CreateReader(Configuration.GetTestWorkbook("Issue263.xls"));
         var ds = reader.AsDataSet();
         Assert.That(ds.Tables[1].Rows[3][0], Is.EqualTo("Economic Inactivity by age\n(Official statistics: not designated as National Statistics)"));
     }
 
     [Test]
-    public void GitIssue265BinaryDisposed()
+    public void Issue265_BinaryDisposed()
     {
-        var stream = Configuration.GetTestWorkbook("Test10x10.xls");
+        var stream = Configuration.GetTestWorkbook("10x10.xls");
         using (IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(stream))
         {
             _ = excelReader.AsDataSet();
@@ -629,17 +629,17 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue286SstStringHeader()
+    public void Issue286_SstStringHeader()
     {
         // Parse xls with SST containing string split exactly between its header and string data across the BIFF Continue records
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_286_SST.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue286_SST.xls"));
         Assert.That(reader, Is.Not.Null);
     }
     
     [Test]
-    public void GitIssue321MissingEof()
+    public void Issue321_MissingEof()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue321.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue321.xls"));
         for (int i = 0; i < 7; i++)
         {
             reader.Read();
@@ -651,7 +651,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue368Header()
+    public void Issue368_Header()
     {
         // This reads a specially crafted XLS which loads in Excel:
         // - Raw BIFF5/8 BIFF stream
@@ -661,7 +661,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         // - Uses LABEL (BIFF3-5) and LABEL_V2 (BIFF2) records
         // - Uses RK (BIFF3-5) and INTEGER (BIFF2) records
         // - Uses FORMAT_V23 (BIFF2-3) and FORMAT (BIFF4-8) records
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_368_header.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue368_Header.xls"));
         reader.Read();
         Assert.That(reader[0], Is.EqualTo("BIFF2"));
         Assert.That(reader[1], Is.EqualTo(1234.5678));
@@ -678,11 +678,11 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue368Formats()
+    public void Issue368_Formats()
     {
         // This reads a BIFF2 XLS worksheet created with Excel 2.0 containing 63 number formats, the maximum allowed by the UI.
         // Excel 2.0/2.1 does not write XF/IXFE records, but writes the FORMAT index as 6 bits in the cell attributes.
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_368_formats.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue368_Formats.xls"));
         for (var i = 0; i < 42; i++)
         {
             reader.Read();
@@ -692,12 +692,12 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue368Ixfe()
+    public void Issue368_Ixfe()
     {
         // This reads a specially crafted XLS which loads in Excel:
         // - BIFF2 worksheet, only BIFF2 records
         // - Uses IXFE records to set format
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_368_ixfe.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue368_Ixfe.xls"));
         reader.Read();
         Assert.That(reader[0], Is.EqualTo("BIFF2"));
         Assert.That(reader[1], Is.EqualTo(1234.5678));
@@ -714,14 +714,14 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue368LabelXf()
+    public void Issue368_LabelXf()
     {
         // This reads a specially crafted XLS which loads in Excel:
         // - BIFF2 worksheet, with mixed version FORMAT records, BIFF3-5 label records and 16 bit XF index
         // - Contains 80 XF records
         // - Excel uses only 6 bits of the BIFF3-5 XF index when present in a BIFF2 worksheet, must use IXFE for >62
         // - Excel 2.0 does not write XF>63, but newer Excels read these records
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_368_label_xf.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue368_LabelXf.xls"));
         reader.Read();
         Assert.That(reader[0], Is.EqualTo("BIFF3-5 record in BIFF2 worksheet with XF 60"));
         Assert.That(reader.GetNumberFormatString(0), Is.EqualTo("\\A@\\B"));
@@ -738,12 +738,12 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue375IxfeRowMap()
+    public void Issue375_IxfeRowMap()
     {
         // This reads a specially crafted XLS which loads in Excel:
         // - 100 rows with IXFE records
         // Verify the internal map of cell offsets used for buffering includes the preceding IXFE records
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_375_ixfe_rowmap.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue375_IxfeRowmap.xls"));
         for (var i = 0; i < 100; i++)
         {
             reader.Read();
@@ -753,19 +753,19 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue382Oom()
+    public void Issue382_Oom()
     {
         Assert.Throws(typeof(CompoundDocumentException), () =>
         {
-            using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_382_oom.xls"));
+            using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue382_Oom.xls"));
             reader.AsDataSet();
         });
     }
 
     [Test]
-    public void GitIssue392Oob()
+    public void Issue392_Oob()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_392_oob.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue392_Oob.xls"));
         var result = reader.AsDataSet().Tables[0];
 
         Assert.That(result.Rows.Count, Is.EqualTo(10));
@@ -775,9 +775,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test(Description = "XF_USED_ATTRIB is not set correctly")]
-    public void GitIssue_341_HorizontalAlignment2()
+    public void Issue_341_HorizontalAlignment2()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Git_Issue_51.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue51.xls"));
         Assert.That(reader.Read(), Is.True);
         Assert.That(reader.Read(), Is.True);
         Assert.That(reader.Read(), Is.True);
@@ -785,9 +785,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test(Description = "Indent is from a style")]
-    public void GitIssue_341_FromStyle()
+    public void Issue_341_FromStyle()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_341_style.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue341_Style.xls"));
         Assert.That(reader.Read(), Is.True);
         Assert.That(reader.GetCellStyle(0).IndentLevel, Is.EqualTo(2));
     }
@@ -802,12 +802,12 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void Test_git_issue_411()
+    public void Issue411()
     {
         // This file has two problems: 
         // - has both Book and Workbook compound streams
         // - has no codepage record, encoding specified in font records
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_411.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue411.xls"));
         Assert.That(reader.ResultsCount, Is.EqualTo(1));
         Assert.That(reader.Read(), Is.True);
         Assert.That(reader.Read(), Is.True);
@@ -815,16 +815,16 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue438() 
+    public void Issue438() 
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_438.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue438.xls"));
         reader.Read();
 
         Assert.That(reader.GetDateTime(0), Is.EqualTo(new DateTime(1992, 05, 15)));
     }
 
     [Test]
-    public void GitIssue_341_Indent()
+    public void Issue_341_Indent()
     {
         int[][] expected =
         {
@@ -836,7 +836,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         };
 
         int index = 0;
-        using var reader = OpenReader("Test_git_issue_341");
+        using var reader = OpenReader("Issue341");
         while (reader.Read())
         {
             int[] expectedRow = expected[index];
@@ -853,7 +853,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue_341_HorizontalAlignment()
+    public void Issue_341_HorizontalAlignment()
     {
         HorizontalAlignment[][] expected =
         {
@@ -865,7 +865,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         };
 
         int index = 0;
-        using var reader = OpenReader("Test_git_issue_341");
+        using var reader = OpenReader("Issue341");
         while (reader.Read())
         {
             HorizontalAlignment[] expectedRow = expected[index];
@@ -882,12 +882,12 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue477_Test_crypto_keylength40()
+    public void Issue477_Test_crypto_keylength40()
     {
         // BIFF8 standard encryption cryptoapi rc4+sha with 40bit key
         // Test file from SheetJS project: password_2002_40_basecrypto.xls
         using var reader = ExcelReaderFactory.CreateBinaryReader(
-            Configuration.GetTestWorkbook("Test_git_issue_477_crypto_keylength40.xls"),
+            Configuration.GetTestWorkbook("Issue477_CryptoKeylength40.xls"),
             new ExcelReaderConfiguration { Password = "password" });
         reader.Read();
         Assert.That(reader.GetDouble(0), Is.EqualTo(1));
@@ -898,27 +898,27 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue467_Test_empty_continue_SST()
+    public void Issue467_Test_empty_continue_SST()
     {
         // File was modified in a hex editor to include an empty CONTINUE record with only a multi byte flag
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_467_sst_empty_continue.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue467_SstEmptyContinue.xls"));
         reader.Read();
     }
 
     [Test]
-    public void GitIssue467_Test_emptier_continue_leftover_bytes_SST()
+    public void Issue467_Test_emptier_continue_leftover_bytes_SST()
     {
         // File was modified in a hex editor to include an empty CONTINUE record without a multi byte flag
         // followed by a CONTINUE record with multibyte flag and a leftover byte
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_467_empty_continue_leftoverbytes.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue467_EmptyContinueLeftoverbytes.xls"));
         reader.Read();
     }
 
     [Test]
-    public void GitIssue467_Test_SST_wrong_count()
+    public void Issue467_Test_SST_wrong_count()
     {
         // Modified 10x10.xls in a hex editor to specify too many strings in the SST
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_477_sst_wrong_count.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue477_SstWrongCount.xls"));
         reader.Read();
         Assert.That(reader.RowCount, Is.EqualTo(10));
         Assert.That(reader.FieldCount, Is.EqualTo(10));
@@ -942,10 +942,10 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue467_Test_SST_zero_count()
+    public void Issue467_Test_SST_zero_count()
     {
         // Modified 10x10.xls in a hex editor to specify zero strings in the SST: Excel doesn't read these
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_477_sst_zero_count.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue477_SstZeroCount.xls"));
         reader.Read();
         Assert.That(reader.RowCount, Is.EqualTo(10));
         Assert.That(reader.FieldCount, Is.EqualTo(10));
@@ -969,9 +969,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue466_BIFF3_Errors()
+    public void Issue466_BIFF3_Errors()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue_466_biff3.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue466_Biff3.xls"));
         
         // First row contains formula errors
         reader.Read();
@@ -1009,9 +1009,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue532MulCells()
+    public void Issue532_MulCells()
     {
-        using var reader = OpenReader("Test_git_issue_532_mulcells");
+        using var reader = OpenReader("Issue532_Mulcells");
         reader.NextResult();
         reader.Read();
 
@@ -1019,9 +1019,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue624MissingBOFInWorksheet()
+    public void Issue624_MissingBOFInWorksheet()
     {
-        using var reader = OpenReader("Test_git_issue624");
+        using var reader = OpenReader("Issue624");
         reader.Read();
         reader.Read();
         reader.Read();
@@ -1043,18 +1043,18 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue609()
+    public void Issue609()
     {
-        using var reader = OpenReader("Test_git_issue_609");
+        using var reader = OpenReader("Issue609");
         reader.Read();
         reader.Read();
         Assert.That(reader.GetString(0), Is.EqualTo("Data di stampa:"));
     }
 
     [Test]
-    public void GitIssue578()
+    public void Issue578()
     {
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_git_issue578.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Issue578.xls"));
 
         reader.Read();
         var values = new object[reader.FieldCount];
@@ -1070,9 +1070,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue642_ActiveSheet()
+    public void Issue642_ActiveSheet()
     {
-        using var reader = OpenReader("Test_git_issue_642");
+        using var reader = OpenReader("Issue642");
         var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration()
         {
             FilterSheet = (tableReader, sheetIndex) => tableReader.IsActiveSheet
@@ -1082,9 +1082,9 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue642_ActiveSheet_SingleWorksheet()
+    public void Issue642_ActiveSheet_SingleWorksheet()
     {
-        using var reader = OpenReader("Test_git_issue_642onesheet");
+        using var reader = OpenReader("Issue642_Onesheet");
         var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration()
         {
             FilterSheet = (tableReader, sheetIndex) => tableReader.IsActiveSheet
@@ -1094,11 +1094,11 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     }
 
     [Test]
-    public void GitIssue525_SstMaterializationReturnsCorrectStrings()
+    public void Issue525_SstMaterializationReturnsCorrectStrings()
     {
         // Verify SST strings are correctly accessible after lazy caching is initialized.
         // XlsWorkbook.ReadWorkbookGlobals() calls SST.Flush() which allocates the cache array.
-        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test10x10.xls"));
+        using var reader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("10x10.xls"));
         reader.Read();
         Assert.That(reader.GetString(0), Is.EqualTo("col1"));
         Assert.That(reader.GetString(4), Is.EqualTo("col5"));
@@ -1115,7 +1115,7 @@ public class ExcelBinaryReaderTest : ExcelTestBase
     [Test]
     public void ClipboardDimension()
     {
-        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("Test_Clipboard_Biff8.xls"));
+        using var excelReader = ExcelReaderFactory.CreateBinaryReader(Configuration.GetTestWorkbook("ClipboardBiff8.xls"));
 
         Assert.That(excelReader.Dimension.FromRow, Is.EqualTo(10));
         Assert.That(excelReader.Dimension.ToRow, Is.EqualTo(11));

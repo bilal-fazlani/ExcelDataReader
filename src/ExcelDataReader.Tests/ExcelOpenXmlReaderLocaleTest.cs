@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Globalization;
 
 namespace ExcelDataReader.Tests;
@@ -10,7 +10,7 @@ public class ExcelOpenXmlReaderLocaleTest
     {
         Thread.CurrentThread.CurrentCulture = new CultureInfo("pl-PL", false);
 
-        using var reader = ExcelReaderFactory.CreateOpenXmlReader(Configuration.GetTestWorkbook("Test_Issue_xxx_LocaleTime.xlsx"));
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(Configuration.GetTestWorkbook("LocaleTime.xlsx"));
         var dataSet = reader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[1][1], Is.EqualTo(new System.DateTime(1899, 12, 31, 1, 34, 0)));
@@ -27,7 +27,7 @@ public class ExcelOpenXmlReaderLocaleTest
         Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE", false);
 
         IExcelDataReader excelReader =
-            ExcelReaderFactory.CreateOpenXmlReader(Configuration.GetTestWorkbook("Test_Decimal_Locale.xlsx"));
+            ExcelReaderFactory.CreateOpenXmlReader(Configuration.GetTestWorkbook("DecimalLocale.xlsx"));
 
         var dataSet = excelReader.AsDataSet();
 

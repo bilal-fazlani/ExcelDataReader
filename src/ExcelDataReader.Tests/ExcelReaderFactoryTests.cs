@@ -3,8 +3,8 @@ namespace ExcelDataReader.Tests;
 [TestFixture]
 public class ExcelReaderFactoryTests
 {
-    [TestCase("Test10x10.xls")]
-    [TestCase("TestUnicodeChars.xls")]
+    [TestCase("10x10.xls")]
+    [TestCase("UnicodeChars.xls")]
     [TestCase("biff3.xls")]
     [TestCase("as3xls_BIFF2.xls")]
     public void ProbeXls(string name)
@@ -13,9 +13,9 @@ public class ExcelReaderFactoryTests
         Assert.That(excelReader.GetType().Name, Is.EqualTo("ExcelBinaryReader"));
     }
 
-    [TestCase("Test10x10.xlsx")]
-    [TestCase("TestOpen.xlsx")]
-    [TestCase("TestOpen.xlsb")]
+    [TestCase("10x10.xlsx")]
+    [TestCase("Open.xlsx")]
+    [TestCase("Open.xlsb")]
     public void ProbeOpenXml(string name)
     {
         using IExcelDataReader excelReader = ExcelReaderFactory.CreateReader(Configuration.GetTestWorkbook(name));

@@ -1,16 +1,16 @@
-﻿using System.Data;
+using System.Data;
 using System.Globalization;
 
 namespace ExcelDataReader.Tests;
 
 public abstract class ExcelTestBase
 {
-    protected abstract DateTime GitIssue82TodayDate { get; }
+    protected abstract DateTime Issue82_TodayDate { get; }
 
     [Test]
     public void IssueDateAndTime1468Test()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Encoding_Formula_Date_1520");
+        using IExcelDataReader excelReader = OpenReader("EncodingFormulaDate1520");
         DataSet dataSet = excelReader.AsDataSet();
 
         string val1 = new DateTime(2009, 05, 01).ToShortDateString();
@@ -25,16 +25,16 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void Issue11773Exponential()
+    public void Issue11773_Exponential()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_11773_Exponential");
+        using IExcelDataReader excelReader = OpenReader("OldIssue11773_Exponential");
         var dataSet = excelReader.AsDataSet(Configuration.FirstRowColumnNamesConfiguration);
 
         Assert.That(dataSet.Tables[0].Rows[0][6], Is.EqualTo(2566.3716814159293D));
     }
 
     [Test]
-    public void Issue11773ExponentialCommas()
+    public void Issue11773_ExponentialCommas()
     {
 #if NETCOREAPP1_0
         CultureInfo.CurrentCulture = new CultureInfo("de-DE");
@@ -42,7 +42,7 @@ public abstract class ExcelTestBase
         System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE", false);
 #endif
 
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_11773_Exponential");
+        using IExcelDataReader excelReader = OpenReader("OldIssue11773_Exponential");
         var dataSet = excelReader.AsDataSet(Configuration.FirstRowColumnNamesConfiguration);
 
         Assert.That(dataSet.Tables[0].Rows[0][6], Is.EqualTo(2566.3716814159293D));
@@ -52,9 +52,9 @@ public abstract class ExcelTestBase
     /// Makes sure that we can read data from the first row of last sheet.
     /// </summary>
     [Test]
-    public void Issue12271NextResultSet()
+    public void Issue12271_NextResultSet()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_LotsOfSheets");
+        using IExcelDataReader excelReader = OpenReader("LotsOfSheets");
         do
         {
             excelReader.Read();
@@ -78,7 +78,7 @@ public abstract class ExcelTestBase
     [Test]
     public void AsDataSetTestReadSheetNames()
     {
-        using IExcelDataReader reader = OpenReader("TestOpen");
+        using IExcelDataReader reader = OpenReader("Open");
         Assert.That(reader.ResultsCount, Is.EqualTo(3));
 
         DataSet dataSet = reader.AsDataSet();
@@ -92,7 +92,7 @@ public abstract class ExcelTestBase
     [Test]
     public void AsDataSetTest()
     {
-        using IExcelDataReader excelReader = OpenReader("TestChess");
+        using IExcelDataReader excelReader = OpenReader("Chess");
         DataSet result = excelReader.AsDataSet();
 
         Assert.That(result != null, Is.True);
@@ -107,7 +107,7 @@ public abstract class ExcelTestBase
     [Test]
     public void AsDataSetTestRowCount()
     {
-        using IExcelDataReader excelReader = OpenReader("TestChess");
+        using IExcelDataReader excelReader = OpenReader("Chess");
         var result = excelReader.AsDataSet(Configuration.NoColumnNamesConfiguration);
 
         Assert.That(result.Tables[0].Rows.Count, Is.EqualTo(4));
@@ -116,7 +116,7 @@ public abstract class ExcelTestBase
     [Test]
     public void AsDataSetTestRowCountFirstRowAsColumnNames()
     {
-        using IExcelDataReader excelReader = OpenReader("TestChess");
+        using IExcelDataReader excelReader = OpenReader("Chess");
         var result = excelReader.AsDataSet(Configuration.FirstRowColumnNamesConfiguration);
 
         Assert.That(result.Tables[0].Rows.Count, Is.EqualTo(3));
@@ -145,9 +145,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue323DoubleClose()
+    public void Issue323_DoubleClose()
     {
-        using var reader = OpenReader("Test10x10");
+        using var reader = OpenReader("10x10");
         reader.Read();
         reader.Close();
     }
@@ -156,7 +156,7 @@ public abstract class ExcelTestBase
     public void MergedCells()
     {
         // XLSX was manually edited to include a <mergecell></mergecell> element with closing tag
-        using var excelReader = OpenReader("Test_MergedCell");
+        using var excelReader = OpenReader("MergedCell");
         excelReader.Read();
 
         Assert.That(excelReader.MergeCells, Is.EquivalentTo(new[]
@@ -173,7 +173,7 @@ public abstract class ExcelTestBase
     {
         // Verify the file stream is closed and disposed by the reader
         {
-            var stream = OpenStream("Test10x10");
+            var stream = OpenStream("10x10");
             using (IExcelDataReader excelReader = OpenReader(stream, new ExcelReaderConfiguration()
             {
                 LeaveOpen = true
@@ -208,25 +208,25 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue245NoCodeName()
+    public void Issue245_NoCodeName()
     {
         // Test no CodeName = null
-        using var reader = OpenReader("Test10x10");
+        using var reader = OpenReader("10x10");
         Assert.That(reader.CodeName, Is.EqualTo(null));
     }
 
     [Test]
-    public void GitIssue245CodeName()
+    public void Issue245_CodeName()
     {
         // Test CodeName is set
-        using var reader = OpenReader("Test_Excel_Dataset");
+        using var reader = OpenReader("ExcelDataset");
         Assert.That(reader.CodeName, Is.EqualTo("Sheet1"));
     }
 
     [Test]
-    public void GitIssue241Simple()
+    public void Issue241_Simple()
     {
-        using var reader = OpenReader("Test_git_issue_224_simple");
+        using var reader = OpenReader("Issue224_Simple");
         Assert.That(reader.HeaderFooter?.OddHeader, Is.EqualTo("&LLeft åäö &T&CCenter åäö &D&RRight  åäö &P"), "Header");
         Assert.That(reader.HeaderFooter?.OddFooter, Is.EqualTo("&LLeft åäö &P&CFooter åäö &P&RRight åäö &D"), "Footer");
     }
@@ -234,7 +234,7 @@ public abstract class ExcelTestBase
     [Test]
     public void Dimension10X10000Test()
     {
-        using IExcelDataReader excelReader = OpenReader("Test10x10000");
+        using IExcelDataReader excelReader = OpenReader("10x10000");
         DataTable result = excelReader.AsDataSet().Tables[0];
 
         Assert.That(result.Rows.Count, Is.EqualTo(10000));
@@ -248,7 +248,7 @@ public abstract class ExcelTestBase
     [Test]
     public void Dimension10X10Test()
     {
-        using IExcelDataReader excelReader = OpenReader("Test10x10");
+        using IExcelDataReader excelReader = OpenReader("10x10");
         DataTable result = excelReader.AsDataSet().Tables[0];
 
         Assert.That(result.Rows.Count, Is.EqualTo(10));
@@ -260,7 +260,7 @@ public abstract class ExcelTestBase
     [Test]
     public void Dimension255X10Test()
     {
-        using IExcelDataReader excelReader = OpenReader("Test255x10");
+        using IExcelDataReader excelReader = OpenReader("255x10");
         DataTable result = excelReader.AsDataSet().Tables[0];
 
         Assert.That(result.Rows.Count, Is.EqualTo(10));
@@ -272,7 +272,7 @@ public abstract class ExcelTestBase
     [Test]
     public void DoublePrecisionTest()
     {
-        using IExcelDataReader excelReader = OpenReader("TestDoublePrecision");
+        using IExcelDataReader excelReader = OpenReader("DoublePrecision");
         DataTable result = excelReader.AsDataSet().Tables[0];
 
         Assert.That(result.Rows.Count, Is.EqualTo(10));
@@ -293,7 +293,7 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue82Date1900()
+    public void Issue82_Date1900()
     {
         // 15/06/2009
         // 4/19/2013 (=TODAY() when file was saved)
@@ -301,11 +301,11 @@ public abstract class ExcelTestBase
 
         DataSet result = excelReader.AsDataSet();
         Assert.That((DateTime)result.Tables[0].Rows[0][0], Is.EqualTo(new DateTime(2009, 6, 15)));
-        Assert.That((DateTime)result.Tables[0].Rows[1][0], Is.EqualTo(GitIssue82TodayDate));
+        Assert.That((DateTime)result.Tables[0].Rows[1][0], Is.EqualTo(Issue82_TodayDate));
     }
 
     [Test]
-    public void GitIssue82Date1904()
+    public void Issue82_Date1904()
     {
         // 15/06/2009
         // 4/19/2013 (=TODAY() when file was saved)
@@ -313,13 +313,13 @@ public abstract class ExcelTestBase
 
         DataSet result = excelReader.AsDataSet();
         Assert.That((DateTime)result.Tables[0].Rows[0][0], Is.EqualTo(new DateTime(2009, 6, 15)));
-        Assert.That((DateTime)result.Tables[0].Rows[1][0], Is.EqualTo(GitIssue82TodayDate));
+        Assert.That((DateTime)result.Tables[0].Rows[1][0], Is.EqualTo(Issue82_TodayDate));
     }
 
     [Test]
     public void TestBlankHeader()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_BlankHeader");
+        using IExcelDataReader excelReader = OpenReader("BlankHeader");
         excelReader.Read();
         Assert.That(excelReader.FieldCount, Is.EqualTo(4));
         excelReader.Read();
@@ -328,7 +328,7 @@ public abstract class ExcelTestBase
     [Test]
     public void IssueDecimal1109Test()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Decimal_1109");
+        using IExcelDataReader excelReader = OpenReader("Decimal1109");
         DataSet dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[0][0], Is.EqualTo(3.14159));
@@ -341,7 +341,7 @@ public abstract class ExcelTestBase
     [Test]
     public void IssueEncoding1520Test()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Encoding_Formula_Date_1520");
+        using IExcelDataReader excelReader = OpenReader("EncodingFormulaDate1520");
         DataSet dataSet = excelReader.AsDataSet();
 
         string val1 = "Simon Hodgetts";
@@ -362,9 +362,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void TestIssue11601ReadSheetNames()
+    public void TestIssue11601_ReadSheetNames()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Excel_Dataset");
+        using IExcelDataReader excelReader = OpenReader("ExcelDataset");
         Assert.That(excelReader.Name, Is.EqualTo("test.csv"));
 
         excelReader.NextResult();
@@ -375,26 +375,26 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue250RichText()
+    public void Issue250_RichText()
     {
-        using var reader = OpenReader("Test_git_issue_250_richtext");
+        using var reader = OpenReader("Issue250_Richtext");
         reader.Read();
         var text = reader.GetString(0);
         Assert.That(text, Is.EqualTo("Lorem ipsum dolor sit amet, ei pri verterem efficiantur, per id meis idque deterruisset."));
     }
 
     [Test]
-    public void GitIssue270EmptyRowsAtTheEnd()
+    public void Issue270_EmptyRowsAtTheEnd()
     {
         // AsDataSet() trims trailing blank rows
-        using (var reader = OpenReader("Test_git_issue_270"))
+        using (var reader = OpenReader("Issue270"))
         {
             var dataSet = reader.AsDataSet();
             Assert.That(dataSet.Tables[0].Rows.Count, Is.EqualTo(1));
         }
 
         // Reader methods do not trim trailing blank rows
-        using (var reader = OpenReader("Test_git_issue_270"))
+        using (var reader = OpenReader("Issue270"))
         {
             var rowCount = 0;
             while (reader.Read())
@@ -404,9 +404,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue283IsoFormatTimeSpan()
+    public void Issue283_IsoFormatTimeSpan()
     {
-        using var reader = OpenReader("Test_git_issue_283_TimeSpan");
+        using var reader = OpenReader("Issue283_TimeSpan");
         reader.Read();
         Assert.That(new TimeSpan(0), Is.EqualTo((TimeSpan)reader[0]));
         Assert.That(new DateTime(1899, 12, 31), Is.EqualTo((DateTime)reader[2])); // Excel says 1/0/1900, not valid in .NET
@@ -441,9 +441,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue329Error()
+    public void Issue329_Error()
     {
-        using var reader = OpenReader("Test_git_issue_329_error");
+        using var reader = OpenReader("Issue329_Error");
         var result = reader.AsDataSet().Tables[0];
 
         // AsDataSet trims trailing empty rows
@@ -464,9 +464,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void Issue4031NullColumn()
+    public void Issue4031_NullColumn()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_4031_NullColumn");
+        using IExcelDataReader excelReader = OpenReader("OldIssue4031_NullColumn");
 
         // DataSet dataSet = excelReader.AsDataSet(true);
         excelReader.Read();
@@ -485,9 +485,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void Issue7433IllegalOleAutDate()
+    public void Issue7433_IllegalOleAutDate()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_7433_IllegalOleAutDate");
+        using IExcelDataReader excelReader = OpenReader("OldIssue7433_IllegalOleAutDate");
         DataSet dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[0][0], Is.EqualTo(3.10101195608231E+17));
@@ -496,9 +496,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void Issue8536Test()
+    public void Issue8536_Test()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_8536");
+        using IExcelDataReader excelReader = OpenReader("OldIssue8536");
         DataSet dataSet = excelReader.AsDataSet();
 
         // date
@@ -535,7 +535,7 @@ public abstract class ExcelTestBase
     [Test]
     public void Issue10725()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_10725");
+        using IExcelDataReader excelReader = OpenReader("OldIssue10725");
         excelReader.Read();
         Assert.That(excelReader.GetValue(0), Is.EqualTo(8.8));
 
@@ -545,9 +545,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void Issue11397CurrencyTest()
+    public void Issue11397_CurrencyTest()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_11397");
+        using IExcelDataReader excelReader = OpenReader("OldIssue11397");
         DataSet dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[1][0].ToString(), Is.EqualTo("$44.99")); // general in spreadsheet so should be a string including the $
@@ -556,9 +556,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void Issue11435Colors()
+    public void Issue11435_Colors()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_11435_Colors");
+        using IExcelDataReader excelReader = OpenReader("OldIssue11435_Colors");
         DataSet dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[0][0].ToString(), Is.EqualTo("test1"));
@@ -573,9 +573,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void Issue11479BlankSheet()
+    public void Issue11479_BlankSheet()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_11479_BlankSheet");
+        using IExcelDataReader excelReader = OpenReader("OldIssue11479_BlankSheet");
 
         // DataSet result = excelReader.AsDataSet(true);
         excelReader.Read();
@@ -590,9 +590,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void Issue11573BlankValues()
+    public void Issue11573_BlankValues()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_11573_BlankValues");
+        using IExcelDataReader excelReader = OpenReader("OldIssue11573_BlankValues");
         var dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[12][0], Is.EqualTo(1D));
@@ -602,7 +602,7 @@ public abstract class ExcelTestBase
     [Test]
     public void IssueBoolFormula()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_BoolFormula");
+        using IExcelDataReader excelReader = OpenReader("BoolFormula");
         DataSet dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows[0][0], Is.EqualTo(true));
@@ -613,7 +613,7 @@ public abstract class ExcelTestBase
     {
         // we want to make sure that if a cell is formatted as a date but it's contents are not a date then
         // the output is not a date (it was ending up as datetime.min)
-        using IExcelDataReader excelReader = OpenReader("Test_Issue_DateFormatButNotDate");
+        using IExcelDataReader excelReader = OpenReader("DateFormatButNotDate");
         excelReader.Read();
         Assert.That(excelReader.GetValue(0), Is.EqualTo("columna"));
         Assert.That(excelReader.GetValue(1), Is.EqualTo("columnb"));
@@ -636,7 +636,7 @@ public abstract class ExcelTestBase
     [Test]
     public void DataReaderReadTest()
     {
-        using IExcelDataReader r = OpenReader("Test_num_double_date_bool_string");
+        using IExcelDataReader r = OpenReader("NumDoubleDateBoolString");
         var table = new DataTable();
         table.Columns.Add(new DataColumn("num_col", typeof(int)));
         table.Columns.Add(new DataColumn("double_col", typeof(double)));
@@ -675,7 +675,7 @@ public abstract class ExcelTestBase
     [Test]
     public void MultiSheetTest()
     {
-        using IExcelDataReader excelReader = OpenReader("TestMultiSheet");
+        using IExcelDataReader excelReader = OpenReader("MultiSheet");
         DataSet result = excelReader.AsDataSet();
 
         Assert.That(result.Tables.Count, Is.EqualTo(3));
@@ -695,7 +695,7 @@ public abstract class ExcelTestBase
     [Test]
     public void DataReaderNextResultTest()
     {
-        using IExcelDataReader r = OpenReader("TestMultiSheet");
+        using IExcelDataReader r = OpenReader("MultiSheet");
         Assert.That(r.ResultsCount, Is.EqualTo(3));
 
         var table = new DataTable();
@@ -761,7 +761,7 @@ public abstract class ExcelTestBase
     [Test]
     public void UnicodeCharsTest()
     {
-        using IExcelDataReader excelReader = OpenReader("TestUnicodeChars");
+        using IExcelDataReader excelReader = OpenReader("UnicodeChars");
         DataTable result = excelReader.AsDataSet().Tables[0];
 
         Assert.That(result.Rows.Count, Is.EqualTo(3));
@@ -770,9 +770,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue29ReadSheetStatesReadsCorrectly()
+    public void Issue29_ReadSheetStatesReadsCorrectly()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Excel_Dataset");
+        using IExcelDataReader excelReader = OpenReader("ExcelDataset");
         Assert.That(excelReader.VisibleState, Is.EqualTo("hidden"));
 
         excelReader.NextResult();
@@ -783,9 +783,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue29AsDataSetProvidesCorrectSheetState()
+    public void Issue29_AsDataSetProvidesCorrectSheetState()
     {
-        using IExcelDataReader reader = OpenReader("Test_Excel_Dataset");
+        using IExcelDataReader reader = OpenReader("ExcelDataset");
         var dataSet = reader.AsDataSet();
 
         Assert.That(dataSet != null, Is.True);
@@ -796,9 +796,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue389FilterSheetByVisibility()
+    public void Issue389_FilterSheetByVisibility()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_Excel_Dataset");
+        using IExcelDataReader excelReader = OpenReader("ExcelDataset");
         var result = excelReader.AsDataSet(new ExcelDataSetConfiguration()
         {
             FilterSheet = (r, index) => r.VisibleState == "visible"
@@ -810,7 +810,7 @@ public abstract class ExcelTestBase
     [Test]
     public void TestNumDoubleDateBoolString()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_num_double_date_bool_string");
+        using IExcelDataReader excelReader = OpenReader("NumDoubleDateBoolString");
         DataSet dataSet = excelReader.AsDataSet();
 
         Assert.That(dataSet.Tables[0].Rows.Count, Is.EqualTo(30));
@@ -845,7 +845,7 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue160FilterRow()
+    public void Issue160_FilterRow()
     {
         // Check there are four rows with data, including empty and hidden rows
         using (var reader = OpenReader("CollapsedHide"))
@@ -910,7 +910,7 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue300FilterColumn()
+    public void Issue300_FilterColumn()
     {
         // Check there are two columns with data
         using (var reader = OpenReader("CollapsedHide"))
@@ -936,7 +936,7 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue483CellErrorEmptyRow()
+    public void Issue483_CellErrorEmptyRow()
     {
         // Check there are four rows with no errors and no NREs
         using var reader = OpenReader("CollapsedHide");
@@ -958,9 +958,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue532TrimEmptyColumns()
+    public void Issue532_TrimEmptyColumns()
     {
-        using var reader = OpenReader("Test_git_issue_532");
+        using var reader = OpenReader("Issue532");
         while (reader.Read())
         {
             Assert.That(reader.FieldCount, Is.EqualTo(3));
@@ -968,9 +968,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue694ExcelTimeFormatTimeSpan()
+    public void Issue694_ExcelTimeFormatTimeSpan()
     {
-        using var reader = OpenReader("Test_git_issue_694_TimeSpan");
+        using var reader = OpenReader("Issue694_TimeSpan");
         reader.Read();
         reader.Read();
         Assert.That(TimeSpan.Parse(reader[1].ToString()), Is.EqualTo(TimeSpan.Parse("-13:57")));
@@ -981,9 +981,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue694ExcelTimeFormatTimeSpanFormulaInvalidResult()
+    public void Issue694_ExcelTimeFormatTimeSpanFormulaInvalidResult()
     {
-        using var reader = OpenReader("Test_git_issue_694_TimeSpan_Formula");
+        using var reader = OpenReader("Issue694_TimeSpanFormula");
         reader.Read();
         Assert.Multiple(() =>
         {
@@ -993,9 +993,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue574VerticalAlignment()
+    public void Issue574_VerticalAlignment()
     {
-        using var reader = OpenReader("Test_git_issue_574");
+        using var reader = OpenReader("Issue574");
         reader.Read();
 
         Assert.That(reader.GetCellStyle(0).VerticalAlignment, Is.EqualTo(VerticalAlignment.Top));
@@ -1004,18 +1004,18 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue618_SinglePassMode_RowCountThrows()
+    public void Issue618_SinglePassMode_RowCountThrows()
     {
-        using var reader = OpenReader(OpenStream("Test10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        using var reader = OpenReader(OpenStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
         Assert.Throws<InvalidOperationException>(() => _ = reader.RowCount);
         reader.Read();
         Assert.Throws<InvalidOperationException>(() => _ = reader.RowCount);
     }
 
     [Test]
-    public void GitIssue618_SinglePassMode_AsDataSet()
+    public void Issue618_SinglePassMode_AsDataSet()
     {
-        using var reader = OpenReader(OpenStream("Test10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        using var reader = OpenReader(OpenStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
         var dataSet = reader.AsDataSet();
         Assert.That(dataSet.Tables[0].Rows.Count, Is.EqualTo(10));
         Assert.That(dataSet.Tables[0].Columns.Count, Is.EqualTo(10));
@@ -1024,9 +1024,9 @@ public abstract class ExcelTestBase
     }
 
     [Test]
-    public void GitIssue618_SinglePassMode_FieldCountGrows()
+    public void Issue618_SinglePassMode_FieldCountGrows()
     {
-        using var reader = OpenReader(OpenStream("Test10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        using var reader = OpenReader(OpenStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
         Assert.That(reader.FieldCount, Is.Zero);
         reader.Read();
         Assert.That(reader.FieldCount, Is.EqualTo(9));
@@ -1037,16 +1037,16 @@ public abstract class ExcelTestBase
         Assert.That(reader.FieldCount, Is.GreaterThanOrEqualTo(10));
     }
 
-    public void GitIssue541BuiltinFormat55IsDate()
+    public void Issue541_BuiltinFormat55IsDate()
     {
-        using var reader = OpenReader("Test_git_issue_541");
+        using var reader = OpenReader("Issue541");
         Assert.That(reader.Read(), Is.True);
         Assert.That(reader.GetValue(0), Is.EqualTo(new DateTime(2021, 1, 15)));
     }
 
     public void AsDataSetTestFillEmptyCellsInMergedRangeNotUseHeaderRow()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_MergedCell");
+        using IExcelDataReader excelReader = OpenReader("MergedCell");
         DataSet result = excelReader.AsDataSet(new ExcelDataSetConfiguration
         {
             ConfigureDataTable = _ => new ExcelDataTableConfiguration
@@ -1073,7 +1073,7 @@ public abstract class ExcelTestBase
     [Test]
     public void AsDataSetTestFillEmptyCellsInMergedRangeUseHeaderRow()
     {
-        using IExcelDataReader excelReader = OpenReader("Test_MergedCell");
+        using IExcelDataReader excelReader = OpenReader("MergedCell");
         DataSet result = excelReader.AsDataSet(new ExcelDataSetConfiguration
         {
             ConfigureDataTable = _ => new ExcelDataTableConfiguration
