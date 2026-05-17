@@ -463,7 +463,7 @@ internal sealed class XlsWorksheet : IWorksheet
 
     private object TryConvertOADateTime(double value, int numberFormatIndex)
     {
-        var format = Workbook.GetNumberFormatString(numberFormatIndex);
+        var format = Workbook.GetNumberFormatString(numberFormatIndex, null);
         if (format != null)
         {
             if (format.IsDateTimeFormat)
@@ -477,7 +477,7 @@ internal sealed class XlsWorksheet : IWorksheet
 
     private object TryConvertOADateTime(int value, int numberFormatIndex)
     {
-        var format = Workbook.GetNumberFormatString(numberFormatIndex);
+        var format = Workbook.GetNumberFormatString(numberFormatIndex, null);
         if (format != null)
         {
             if (format.IsDateTimeFormat)

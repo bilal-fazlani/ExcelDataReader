@@ -198,7 +198,7 @@ internal sealed class XlsxWorksheet : IWorksheet
                 return null;
 
             case double number:
-                var format = Workbook.GetNumberFormatString(numberFormatIndex);
+                var format = Workbook.GetNumberFormatString(numberFormatIndex, null);
                 if (format != null)
                 {
                     if (format.IsDateTimeFormat)
@@ -213,7 +213,7 @@ internal sealed class XlsxWorksheet : IWorksheet
                 return date;
 
             case string s:
-                NumberFormatString numberFormat = Workbook.GetNumberFormatString(numberFormatIndex);
+                NumberFormatString numberFormat = Workbook.GetNumberFormatString(numberFormatIndex, null);
                 if (numberFormat.IsTimeSpanFormat && TryParseToTimeSpan(s, out var timeSpan))
                 {
                     return timeSpan;

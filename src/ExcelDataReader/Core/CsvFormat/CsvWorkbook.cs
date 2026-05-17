@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿#nullable enable
+
+using System.Text;
 using ExcelDataReader.Core.NumberFormat;
 
 namespace ExcelDataReader.Core.CsvFormat;
@@ -26,7 +28,5 @@ internal sealed class CsvWorkbook(Stream stream, Encoding encoding, char[] autod
         yield return new CsvWorksheet(Stream, Encoding, AutodetectSeparators, AnalyzeInitialCsvRows, QuoteChar, TrimWhiteSpace);
     }
 
-    public NumberFormatString GetNumberFormatString(int index) => null;
-
-    public NumberFormatString? GetNumberFormatString(int index, IFormatProvider provider) => null;
+    public NumberFormatString? GetNumberFormatString(int index, IFormatProvider? provider) => null;
 }

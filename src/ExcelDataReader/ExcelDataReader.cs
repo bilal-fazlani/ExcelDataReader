@@ -148,7 +148,7 @@ internal abstract class ExcelDataReader<TWorkbook, TWorksheet> : IExcelDataReade
             throw new InvalidOperationException("No data exists for the row/column.");
         if (RowCells[i]?.EffectiveStyle is not { } effectiveStyle)
             return null;
-        return Workbook.GetNumberFormatString(effectiveStyle.NumberFormatIndex)?.FormatString;
+        return Workbook.GetNumberFormatString(effectiveStyle.NumberFormatIndex, null)?.FormatString;
     }
 
     public string GetNumberFormatString(int i, IFormatProvider provider)

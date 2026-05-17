@@ -51,27 +51,25 @@ internal class CommonWorkbook
             Formats.Add(formatIndexInFile, new NumberFormatString(formatString));
     }
 
-    public NumberFormatString GetNumberFormatString(int numberFormatIndex)
-    {
-        if (Formats.TryGetValue(numberFormatIndex, out var numberFormat))
-            return numberFormat;
-
-#pragma warning disable CA1304 // Intentional: no-culture path returns hardcoded locale-independent format strings
-        return BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex) ?? GeneralNumberFormat;
-#pragma warning restore CA1304
-    }
-
-    public NumberFormatString? GetNumberFormatString(int numberFormatIndex, IFormatProvider provider)
+    public NumberFormatString? GetNumberFormatString(int numberFormatIndex, IFormatProvider? provider)
     {
         // User-defined formats (from the workbook file) take precedence.
         if (Formats.TryGetValue(numberFormatIndex, out var numberFormat))
             return numberFormat;
 
+        // null provider means locale-independent built-in strings.
+        if (provider == null)
+        {
+#pragma warning disable CA1305 // Intentional: null provider returns hardcoded locale-independent format strings
+            return BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex) ?? GeneralNumberFormat;
+#pragma warning restore CA1305
+        }
+
         // For locale-sensitive built-in indices (14–17, 22) derive the pattern from the
         // provider; fall back to the hardcoded string for all other indices.
-#pragma warning disable CA1304 // Intentional: fallback to hardcoded strings when no locale-specific override exists
+#pragma warning disable CA1305 // Intentional: fallback to hardcoded strings when no locale-specific override exists
         return BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex, provider)
             ?? BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex);
-#pragma warning restore CA1304
+#pragma warning restore CA1305
     }
 }
