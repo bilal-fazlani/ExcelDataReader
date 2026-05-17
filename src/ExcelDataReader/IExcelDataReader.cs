@@ -76,6 +76,19 @@ public interface IExcelDataReader : IDataReader
     string GetNumberFormatString(int i);
 
     /// <summary>
+    /// Gets the number format for the specified field using locale-dependent format patterns,
+    /// -or- <see langword="null"/> if there is no value.
+    /// </summary>
+    /// <param name="i">The index of the field to find.</param>
+    /// <param name="provider">
+    /// An <see cref="IFormatProvider"/> (typically a <see cref="System.Globalization.CultureInfo"/>
+    /// or <see cref="System.Globalization.DateTimeFormatInfo"/>) used to resolve locale-dependent
+    /// built-in number format indices (14–17 and 22) to culture-specific date/time format strings.
+    /// </param>
+    /// <returns>The number format string of the specified field.</returns>
+    string GetNumberFormatString(int i, IFormatProvider provider);
+
+    /// <summary>
     /// Gets the number format index for the specified field -or- -1 if there is no value.
     /// </summary>
     /// <param name="i">The index of the field to find.</param>

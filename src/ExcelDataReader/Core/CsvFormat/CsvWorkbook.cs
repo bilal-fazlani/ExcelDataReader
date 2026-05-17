@@ -26,8 +26,7 @@ internal sealed class CsvWorkbook(Stream stream, Encoding encoding, char[] autod
         yield return new CsvWorksheet(Stream, Encoding, AutodetectSeparators, AnalyzeInitialCsvRows, QuoteChar, TrimWhiteSpace);
     }
 
-    public NumberFormatString GetNumberFormatString(int index)
-    {
-        return null;
-    }
+    public NumberFormatString GetNumberFormatString(int index) => null;
+
+    public NumberFormatString? GetNumberFormatString(int index, IFormatProvider provider) => null;
 }

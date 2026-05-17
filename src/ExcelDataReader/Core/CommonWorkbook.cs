@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using System.Globalization;
 using ExcelDataReader.Core.NumberFormat;
 
 namespace ExcelDataReader.Core;
@@ -27,12 +26,6 @@ internal class CommonWorkbook
     public List<ExtendedFormat> CellStyleExtendedFormats { get; } = [];
 
     public bool SinglePassMode { get; set; }
-  
-    /// <summary>
-    /// Gets or sets the culture to use for locale-dependent built-in number format indices.
-    /// When null (the default), hardcoded format strings are used.
-    /// </summary>
-    public CultureInfo? Culture { get; set; }
 
     private NumberFormatString GeneralNumberFormat { get; } = new("General");
 
@@ -61,22 +54,24 @@ internal class CommonWorkbook
     public NumberFormatString GetNumberFormatString(int numberFormatIndex)
     {
         if (Formats.TryGetValue(numberFormatIndex, out var numberFormat))
-        {
             return numberFormat;
-        }
 
-        numberFormat = Culture != null
-            ? BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex, Culture)
-#pragma warning disable CA1304 // Intentional: null Culture means use hardcoded formats for backward compatibility
-            : BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex);
+#pragma warning disable CA1304 // Intentional: no-culture path returns hardcoded locale-independent format strings
+        return BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex) ?? GeneralNumberFormat;
 #pragma warning restore CA1304
-        if (numberFormat != null)
-        {
-            Formats[numberFormatIndex] = numberFormat; // cache for future lookups
-            return numberFormat;
-        }
+    }
 
-        // Fall back to "General" if the number format index is invalid
-        return GeneralNumberFormat;
+    public NumberFormatString? GetNumberFormatString(int numberFormatIndex, IFormatProvider provider)
+    {
+        // User-defined formats (from the workbook file) take precedence.
+        if (Formats.TryGetValue(numberFormatIndex, out var numberFormat))
+            return numberFormat;
+
+        // For locale-sensitive built-in indices (14–17, 22) derive the pattern from the
+        // provider; fall back to the hardcoded string for all other indices.
+#pragma warning disable CA1304 // Intentional: fallback to hardcoded strings when no locale-specific override exists
+        return BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex, provider)
+            ?? BuiltinNumberFormat.GetBuiltinNumberFormat(numberFormatIndex);
+#pragma warning restore CA1304
     }
 }

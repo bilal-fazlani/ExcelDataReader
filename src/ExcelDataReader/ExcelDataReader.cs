@@ -151,6 +151,15 @@ internal abstract class ExcelDataReader<TWorkbook, TWorksheet> : IExcelDataReade
         return Workbook.GetNumberFormatString(effectiveStyle.NumberFormatIndex)?.FormatString;
     }
 
+    public string GetNumberFormatString(int i, IFormatProvider provider)
+    {
+        if (RowCells == null)
+            throw new InvalidOperationException("No data exists for the row/column.");
+        if (RowCells[i]?.EffectiveStyle is not { } effectiveStyle)
+            return null;
+        return Workbook.GetNumberFormatString(effectiveStyle.NumberFormatIndex, provider)?.FormatString;
+    }
+
     public int GetNumberFormatIndex(int i)
     {
         if (RowCells == null)

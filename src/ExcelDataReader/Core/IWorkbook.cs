@@ -16,4 +16,6 @@ internal interface IWorkbook<TWorksheet>
     IEnumerable<TWorksheet> ReadWorksheets();
 
     NumberFormatString GetNumberFormatString(int index);
+
+    NumberFormatString? GetNumberFormatString(int index, IFormatProvider provider);
 }

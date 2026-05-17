@@ -105,14 +105,16 @@ internal static class BuiltinNumberFormat
         return null;
     }
 
-    public static NumberFormatString? GetBuiltinNumberFormat(int numFmtId, CultureInfo culture)
+    public static NumberFormatString? GetBuiltinNumberFormat(int numFmtId, IFormatProvider provider)
     {
+        var dtf = DateTimeFormatInfo.GetInstance(provider);
+
         if (numFmtId == 14)
-            return new NumberFormatString(DatePatternToExcel(culture.DateTimeFormat.ShortDatePattern));
+            return new NumberFormatString(DatePatternToExcel(dtf.ShortDatePattern));
 
         if (numFmtId == 15 || numFmtId == 16 || numFmtId == 17)
         {
-            var sep = EscapeExcelLiteral(culture.DateTimeFormat.DateSeparator);
+            var sep = EscapeExcelLiteral(dtf.DateSeparator);
             return numFmtId switch
             {
                 15 => new NumberFormatString($"d{sep}mmm{sep}yy"),
@@ -123,8 +125,8 @@ internal static class BuiltinNumberFormat
 
         if (numFmtId == 22)
         {
-            var date = DatePatternToExcel(culture.DateTimeFormat.ShortDatePattern);
-            var time = TimePatternToExcel(culture.DateTimeFormat.ShortTimePattern);
+            var date = DatePatternToExcel(dtf.ShortDatePattern);
+            var time = TimePatternToExcel(dtf.ShortTimePattern);
             return new NumberFormatString($"{date} {time}");
         }
 

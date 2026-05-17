@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using ExcelDataReader.Core.BinaryFormat;
 
@@ -6,10 +5,9 @@ namespace ExcelDataReader;
 
 internal sealed class ExcelBinaryReader : ExcelDataReader<XlsWorkbook, XlsWorksheet>
 {
-    public ExcelBinaryReader(Stream stream, string password, Encoding fallbackEncoding, CultureInfo culture = null, bool singlePassMode = false)
+    public ExcelBinaryReader(Stream stream, string password, Encoding fallbackEncoding, bool singlePassMode = false)
     {
         Workbook = new XlsWorkbook(stream, password, fallbackEncoding);
-        Workbook.Culture = culture;
         Workbook.SinglePassMode = singlePassMode;
         SinglePassMode = singlePassMode;
         

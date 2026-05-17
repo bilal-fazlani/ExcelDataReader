@@ -597,26 +597,20 @@ public class ExcelOpenXmlReaderTest : ExcelOpenXmlReaderBase
     public void GitIssue461_Format14WithEnUsCultureReturnsCorrectFormatString()
     {
         using var stream = Configuration.GetTestWorkbook("Test_git_issue_461.xlsx");
-        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream, new ExcelReaderConfiguration
-        {
-            Culture = new System.Globalization.CultureInfo("en-US"),
-        });
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
 
         Assert.That(reader.Read(), Is.True);
-        Assert.That(reader.GetNumberFormatString(0), Is.EqualTo("m/d/yyyy"));
+        Assert.That(reader.GetNumberFormatString(0, new System.Globalization.CultureInfo("en-US")), Is.EqualTo("m/d/yyyy"));
     }
 
     [Test]
     public void GitIssue461_Format14WithEnGbCultureReturnsCorrectFormatString()
     {
         using var stream = Configuration.GetTestWorkbook("Test_git_issue_461.xlsx");
-        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream, new ExcelReaderConfiguration
-        {
-            Culture = new System.Globalization.CultureInfo("en-GB"),
-        });
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
 
         Assert.That(reader.Read(), Is.True);
-        Assert.That(reader.GetNumberFormatString(0), Is.EqualTo("dd/mm/yyyy"));
+        Assert.That(reader.GetNumberFormatString(0, new System.Globalization.CultureInfo("en-GB")), Is.EqualTo("dd/mm/yyyy"));
     }
 
     [Test]
@@ -633,30 +627,26 @@ public class ExcelOpenXmlReaderTest : ExcelOpenXmlReaderBase
     public void GitIssue461_Formats15To17WithEnUsCultureUsesSlashSeparator()
     {
         using var stream = Configuration.GetTestWorkbook("Test_git_issue_461.xlsx");
-        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream, new ExcelReaderConfiguration
-        {
-            Culture = new System.Globalization.CultureInfo("en-US"),
-        });
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+        var enUs = new System.Globalization.CultureInfo("en-US");
 
         Assert.That(reader.Read(), Is.True);
-        Assert.That(reader.GetNumberFormatString(1), Is.EqualTo("d/mmm/yy"));  // format 15
-        Assert.That(reader.GetNumberFormatString(2), Is.EqualTo("d/mmm"));     // format 16
-        Assert.That(reader.GetNumberFormatString(3), Is.EqualTo("mmm/yy"));    // format 17
+        Assert.That(reader.GetNumberFormatString(1, enUs), Is.EqualTo("d/mmm/yy"));  // format 15
+        Assert.That(reader.GetNumberFormatString(2, enUs), Is.EqualTo("d/mmm"));     // format 16
+        Assert.That(reader.GetNumberFormatString(3, enUs), Is.EqualTo("mmm/yy"));    // format 17
     }
 
     [Test]
     public void GitIssue461_Formats15To17WithDeDeCultureUsesDotSeparator()
     {
         using var stream = Configuration.GetTestWorkbook("Test_git_issue_461.xlsx");
-        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream, new ExcelReaderConfiguration
-        {
-            Culture = new System.Globalization.CultureInfo("de-DE"),
-        });
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+        var deDE = new System.Globalization.CultureInfo("de-DE");
 
         Assert.That(reader.Read(), Is.True);
-        Assert.That(reader.GetNumberFormatString(1), Is.EqualTo("d.mmm.yy"));  // format 15
-        Assert.That(reader.GetNumberFormatString(2), Is.EqualTo("d.mmm"));     // format 16
-        Assert.That(reader.GetNumberFormatString(3), Is.EqualTo("mmm.yy"));    // format 17
+        Assert.That(reader.GetNumberFormatString(1, deDE), Is.EqualTo("d.mmm.yy"));  // format 15
+        Assert.That(reader.GetNumberFormatString(2, deDE), Is.EqualTo("d.mmm"));     // format 16
+        Assert.That(reader.GetNumberFormatString(3, deDE), Is.EqualTo("mmm.yy"));    // format 17
     }
 
     [Test]
@@ -674,12 +664,9 @@ public class ExcelOpenXmlReaderTest : ExcelOpenXmlReaderBase
     [Test]
     public void GitIssue461_CellValueIsDateTimeRegardlessOfCulture()
     {
-        // Whether culture is set or not, cells with format 14 should be returned as DateTime
+        // Whether a provider is passed or not, cells with format 14 should be returned as DateTime
         using var stream = Configuration.GetTestWorkbook("Test_git_issue_461.xlsx");
-        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream, new ExcelReaderConfiguration
-        {
-            Culture = new System.Globalization.CultureInfo("en-US"),
-        });
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
 
         Assert.That(reader.Read(), Is.True);
         Assert.That(reader.GetValue(0), Is.EqualTo(new DateTime(2023, 1, 1)));
