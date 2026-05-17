@@ -15,7 +15,7 @@ public class ReadEncrypted
     [Benchmark]
     public void Xlsx()
     {
-        using var reader = ExcelReaderFactory.CreateReader(typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test_git_issue289.xlsx"));
+        using var reader = ExcelReaderFactory.CreateReader(typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Issue289.xlsx"));
         Read(reader);
     }
 

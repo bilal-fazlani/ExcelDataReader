@@ -15,21 +15,21 @@ public class OpenXmlFile
     [Benchmark]
     public bool OpenSingleFileXslx()
     {
-        using var reader = ExcelReaderFactory.CreateReader(typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xlsx"));
+        using var reader = ExcelReaderFactory.CreateReader(typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xlsx"));
         return reader.Read();
     }
 
     [Benchmark]
     public bool OpenSingleFileXslb()
     {
-        using var reader = ExcelReaderFactory.CreateReader(typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xlsb"));
+        using var reader = ExcelReaderFactory.CreateReader(typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xlsb"));
         return reader.Read();
     }
 
     [Benchmark]
     public bool OpenSingleFileXls()
     {
-        using var reader = ExcelReaderFactory.CreateReader(typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xls"));
+        using var reader = ExcelReaderFactory.CreateReader(typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xls"));
         return reader.Read();
     }
 }

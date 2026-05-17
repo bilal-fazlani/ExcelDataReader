@@ -19,7 +19,7 @@ public class SinglePassRead
     public void ReadMultiPassXlsx()
     {
         using var reader = ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xlsx"),
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xlsx"),
             MultiPassConfig);
         Read(reader);
     }
@@ -28,7 +28,7 @@ public class SinglePassRead
     public void ReadSinglePassXlsx()
     {
         using var reader = ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xlsx"),
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xlsx"),
             SinglePassConfig);
         Read(reader);
     }
@@ -37,7 +37,7 @@ public class SinglePassRead
     public void ReadMultiPassXlsb()
     {
         using var reader = ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xlsb"),
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xlsb"),
             MultiPassConfig);
         Read(reader);
     }
@@ -46,7 +46,7 @@ public class SinglePassRead
     public void ReadSinglePassXlsb()
     {
         using var reader = ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xlsb"),
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xlsb"),
             SinglePassConfig);
         Read(reader);
     }
@@ -55,7 +55,7 @@ public class SinglePassRead
     public void ReadMultiPassXls()
     {
         using var reader = ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xls"),
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xls"),
             MultiPassConfig);
         Read(reader);
     }
@@ -64,7 +64,7 @@ public class SinglePassRead
     public void ReadSinglePassXls()
     {
         using var reader = ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xls"),
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xls"),
             SinglePassConfig);
         Read(reader);
     }

@@ -22,21 +22,21 @@ public class ReadAllStrings
     public string ReadAllStringsXlsx()
     {
         return ReadStrings(ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xlsx")));
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xlsx")));
     }
 
     [Benchmark]
     public string ReadAllStringsXlsb()
     {
         return ReadStrings(ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xlsb")));
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xlsb")));
     }
 
     [Benchmark]
     public string ReadAllStringsXls()
     {
         return ReadStrings(ExcelReaderFactory.CreateReader(
-            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.Test10x10000.xls")));
+            typeof(OpenXmlFile).Assembly.GetManifestResourceStream("ExcelDataReader.Benchmarks.10x10000.xls")));
     }
 
     private static string ReadStrings(IExcelDataReader reader)
