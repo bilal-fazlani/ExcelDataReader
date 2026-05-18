@@ -43,6 +43,20 @@ public class NumberFormatString
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="NumberFormatString"/> class with
+    /// pre-known classification, bypassing parsing. Used for built-in format indices whose
+    /// <see cref="IsDateTimeFormat"/> and <see cref="IsTimeSpanFormat"/> values are fixed by spec.
+    /// </summary>
+    internal NumberFormatString(string formatString, bool isDateTimeFormat, bool isTimeSpanFormat)
+    {
+        IsValid = true;
+        FormatString = formatString;
+        IsDateTimeFormat = isDateTimeFormat;
+        IsTimeSpanFormat = isTimeSpanFormat;
+        Sections = [];
+    }
+
+    /// <summary>
     /// Gets a value indicating whether the number format string is valid.
     /// </summary>
     public bool IsValid { get; }
