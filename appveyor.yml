@@ -7,7 +7,7 @@ build_script:
     If ($Env:APPVEYOR_REPO_BRANCH -eq "master") {
       $Env:VERSION_SUFFIX=""
     } Else {
-      $Env:VERSION_SUFFIX=$Env:APPVEYOR_REPO_BRANCH + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
+      $Env:VERSION_SUFFIX=$Env:APPVEYOR_REPO_BRANCH.Replace("/", "-") + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
     }
     msbuild /t:Restore /p:VersionSuffix=$Env:VERSION_SUFFIX
     msbuild ExcelDataReader.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=$Env:CONFIGURATION /p:VersionSuffix=$Env:VERSION_SUFFIX /p:TreatWarningsAsErrors=true
