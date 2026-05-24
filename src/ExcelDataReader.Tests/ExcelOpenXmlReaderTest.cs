@@ -672,6 +672,68 @@ public class ExcelOpenXmlReaderTest : ExcelOpenXmlReaderBase
         Assert.That(reader.GetValue(0), Is.EqualTo(new DateTime(2023, 1, 1)));
     }
 
+    [Test]
+    public void Issue461_Format20WithEnUsCultureFallsBackToSpecString()
+    {
+        // en-US uses 12h AM/PM time, so index 20 (explicitly non-AM/PM) falls back to the spec string
+        using var stream = Configuration.GetTestWorkbook("Issue461.xlsx");
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+
+        Assert.That(reader.Read(), Is.True);
+        Assert.That(reader.GetNumberFormatString(4, new System.Globalization.CultureInfo("en-US")), Is.EqualTo("h:mm"));
+    }
+
+    [Test]
+    public void Issue461_Format20WithDeDeCultureReturnsTwentyFourHourTime()
+    {
+        using var stream = Configuration.GetTestWorkbook("Issue461.xlsx");
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+
+        Assert.That(reader.Read(), Is.True);
+        Assert.That(reader.GetNumberFormatString(4, new System.Globalization.CultureInfo("de-DE")), Is.EqualTo("hh:mm"));
+    }
+
+    [Test]
+    public void Issue461_Format20DefaultBehaviorUnchanged()
+    {
+        using var stream = Configuration.GetTestWorkbook("Issue461.xlsx");
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+
+        Assert.That(reader.Read(), Is.True);
+        Assert.That(reader.GetNumberFormatString(4), Is.EqualTo("h:mm"));
+    }
+
+    [Test]
+    public void Issue461_Format21WithEnUsCultureFallsBackToSpecString()
+    {
+        // en-US uses 12h AM/PM time, so index 21 (explicitly non-AM/PM) falls back to the spec string
+        using var stream = Configuration.GetTestWorkbook("Issue461.xlsx");
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+
+        Assert.That(reader.Read(), Is.True);
+        Assert.That(reader.GetNumberFormatString(5, new System.Globalization.CultureInfo("en-US")), Is.EqualTo("h:mm:ss"));
+    }
+
+    [Test]
+    public void Issue461_Format21WithDeDeCultureReturnsTwentyFourHourTime()
+    {
+        using var stream = Configuration.GetTestWorkbook("Issue461.xlsx");
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+
+        Assert.That(reader.Read(), Is.True);
+        Assert.That(reader.GetNumberFormatString(5, new System.Globalization.CultureInfo("de-DE")), Is.EqualTo("hh:mm:ss"));
+    }
+
+    [Test]
+    public void Issue461_Format21DefaultBehaviorUnchanged()
+    {
+        using var stream = Configuration.GetTestWorkbook("Issue461.xlsx");
+        using var reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+
+        Assert.That(reader.Read(), Is.True);
+        Assert.That(reader.GetNumberFormatString(5), Is.EqualTo("h:mm:ss"));
+    }
+
     protected override IExcelDataReader OpenReader(Stream stream, ExcelReaderConfiguration configuration = null) 
     => ExcelReaderFactory.CreateOpenXmlReader(stream, configuration);
 

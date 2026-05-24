@@ -124,6 +124,20 @@ internal static class BuiltinNumberFormat
             return new NumberFormatString(s, isDateTimeFormat: true, isTimeSpanFormat: false);
         }
 
+        if (numFmtId == 20)
+        {
+            var pattern = TimePatternToExcel(dtf.ShortTimePattern);
+            if (!pattern.Contains("AM/PM") && !pattern.Contains("A/P"))
+                return new NumberFormatString(pattern, isDateTimeFormat: true, isTimeSpanFormat: false);
+        }
+
+        if (numFmtId == 21)
+        {
+            var pattern = TimePatternToExcel(dtf.LongTimePattern);
+            if (!pattern.Contains("AM/PM") && !pattern.Contains("A/P"))
+                return new NumberFormatString(pattern, isDateTimeFormat: true, isTimeSpanFormat: false);
+        }
+
         if (numFmtId == 22)
         {
             var date = DatePatternToExcel(dtf.ShortDatePattern);
