@@ -75,6 +75,8 @@ See also the configuration options `FallbackEncoding` and `AutodetectSeparators`
 
 The input CSV is always parsed once completely to set FieldCount, RowCount, Encoding, Separator (or twice if the CSV lacks BOM and is not UTF8), and then parsed once again while iterating the row records. Throws `System.Text.DecoderFallbackException` if the input cannot be parsed with the specified encoding.
 
+For large CSV files where `RowCount` is not needed upfront and `FieldCount` from the first row (e.g. a header row) is sufficient, set `AnalyzeInitialCsvRows = 1` to limit the pre-scan to a single row. This avoids reading the entire file twice.
+
 The reader returns all CSV field values as strings and makes no attempts to convert the data to numbers or dates. This caller is responsible for interpreting the CSV data.
 
 ### Using the reader methods
