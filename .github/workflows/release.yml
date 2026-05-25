@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Parse version from tag
+        id: version
+        shell: pwsh
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          $version = $env:TAG.TrimStart('v')
+          $parts = $version -split '-', 2
+          $prefix = $parts[0]
+          $suffix = if ($parts.Length -gt 1) { $parts[1] } else { '' }
+          "prefix=$prefix" >> $env:GITHUB_OUTPUT
+          "suffix=$suffix" >> $env:GITHUB_OUTPUT
+
+      - name: Restore
+        run: dotnet restore --locked-mode
+
+      - name: Build
+        env:
+          VERSION_PREFIX: ${{ steps.version.outputs.prefix }}
+          VERSION_SUFFIX: ${{ steps.version.outputs.suffix }}
+        run: dotnet build ExcelDataReader.sln --no-restore -c Release /p:TreatWarningsAsErrors=true /p:VersionPrefix=$env:VERSION_PREFIX /p:VersionSuffix=$env:VERSION_SUFFIX
+
+      - name: Test
+        run: dotnet test src/ExcelDataReader.Tests/ExcelDataReader.Tests.csproj --no-build -c Release
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: '**/*.nupkg'
+
+  draft-release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: packages
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [[ "$TAG" == *-* ]]; then PRERELEASE="--prerelease"; else PRERELEASE=""; fi
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --generate-notes --title "$TAG" $PRERELEASE ./**/*.nupkg
