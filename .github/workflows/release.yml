@@ -40,7 +40,7 @@ jobs:
         env:
           VERSION_PREFIX: ${{ steps.version.outputs.prefix }}
           VERSION_SUFFIX: ${{ steps.version.outputs.suffix }}
-        run: dotnet build ExcelDataReader.sln --no-restore -c Release /p:TreatWarningsAsErrors=true /p:VersionPrefix=$env:VERSION_PREFIX /p:VersionSuffix=$env:VERSION_SUFFIX
+        run: dotnet build ExcelDataReader.slnx --no-restore -c Release /p:TreatWarningsAsErrors=true /p:VersionPrefix=$env:VERSION_PREFIX /p:VersionSuffix=$env:VERSION_SUFFIX
 
       - name: Test
         run: dotnet test src/ExcelDataReader.Tests/ExcelDataReader.Tests.csproj --no-build -c Release
