@@ -36,7 +36,7 @@ internal static class Configuration
     public static string GetTestWorkbookPath(string key)
     {
         var directory = TestContext.CurrentContext.TestDirectory;
-        while (directory != null && !File.Exists(Path.Combine(directory, "ExcelDataReader.sln")))
+        while (directory != null && !File.Exists(Path.Combine(directory, "ExcelDataReader.slnx")))
             directory = Path.GetDirectoryName(directory);
 
         var resources = Path.Combine(directory, "src/TestData");
