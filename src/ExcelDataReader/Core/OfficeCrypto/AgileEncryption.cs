@@ -119,7 +119,7 @@ internal sealed class AgileEncryption : EncryptionInfo
 
     private static byte[] GenerateSecretKey(string password, byte[] saltValue, HashIdentifier hashIdentifier, byte[] encryptedKeyValue, int spinCount, int keyBits, SymmetricAlgorithm cipher)
     {
-        var block3 = new byte[] { 0x14, 0x6e, 0x0b, 0xe7, 0xab, 0xac, 0xd0, 0xd6 };
+        byte[] block3 = [0x14, 0x6e, 0x0b, 0xe7, 0xab, 0xac, 0xd0, 0xd6];
 
         byte[] hash;
         using (var hashAlgorithm = CryptoHelpers.Create(hashIdentifier))

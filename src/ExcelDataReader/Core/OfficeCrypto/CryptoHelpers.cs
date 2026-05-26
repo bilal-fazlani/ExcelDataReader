@@ -26,7 +26,12 @@ internal static class CryptoHelpers
 
     public static byte[] Combine(byte[] first, byte[] second) => [.. first, .. second];
 
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+    // params ReadOnlySpan<T> avoids the implicit array allocation on modern runtimes.
+    public static byte[] Combine(params ReadOnlySpan<byte[]> arrays)
+#else
     public static byte[] Combine(params byte[][] arrays)
+#endif
     {
         var length = 0;
         for (var i = 0; i < arrays.Length; i++)

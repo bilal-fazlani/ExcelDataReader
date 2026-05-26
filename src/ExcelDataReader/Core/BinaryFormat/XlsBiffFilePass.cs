@@ -29,7 +29,7 @@ internal sealed class XlsBiffFilePass : XlsBiffRecord
             }
             else if (type == 1)
             {
-                var encryptionInfo = new byte[bytes.Length - 6]; // 6 = 4 + 2 = biffVersion header + filepass enryptiontype
+                var encryptionInfo = new byte[bytes.Length - 6]; // 6 = 4 + 2 = biffVersion header + filepass encryption type
                 Array.Copy(bytes, 6, encryptionInfo, 0, bytes.Length - 6);
                 EncryptionInfo = EncryptionInfo.Create(encryptionInfo);
             }

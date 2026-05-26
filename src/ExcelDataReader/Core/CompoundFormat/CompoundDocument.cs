@@ -63,7 +63,12 @@ internal sealed class CompoundDocument
         return BitConverter.ToUInt64(probe, 0) == 0xE11AB1A1E011CFD0;
     }
 
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+    // params ReadOnlySpan<T> avoids the implicit array allocation on modern runtimes.
+    internal CompoundDirectoryEntry FindEntry(params ReadOnlySpan<string> entryNames)
+#else
     internal CompoundDirectoryEntry FindEntry(params string[] entryNames)
+#endif
     {
         foreach (var e in Entries)
         {

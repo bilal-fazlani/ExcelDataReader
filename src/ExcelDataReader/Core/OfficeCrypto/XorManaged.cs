@@ -114,7 +114,7 @@ internal sealed class XorManaged : SymmetricAlgorithm
         Array.Copy(PadArray, 0, obfuscationArray, passwordBytes.Length, PadArray.Length - passwordBytes.Length + 1);
 
         var xorKey = CreateXorKey_Method1(passwordBytes);
-        byte[] baseKeyLE = new byte[] { (byte)(xorKey & 0xFF), (byte)((xorKey >> 8) & 0xFF) };
+        byte[] baseKeyLE = [(byte)(xorKey & 0xFF), (byte)((xorKey >> 8) & 0xFF)];
         int nRotateSize = 2;
         for (int i = 0; i < obfuscationArray.Length; i++)
         {

@@ -7,12 +7,12 @@ internal static class StreamExtensions
     public static int ReadAtLeast(this Stream stream, byte[] buffer, int offset, int minimumBytes)
     {
 #if NET8_0_OR_GREATER
-        ArgumentOutOfRangeException.ThrowIfNegative(minimumBytes);
-        ArgumentOutOfRangeException.ThrowIfLessThan(buffer.Length, offset + minimumBytes);
+        // Delegate to the BCL overload (Stream.ReadAtLeast added in .NET 7).
+        return stream.ReadAtLeast(buffer.AsSpan(offset, minimumBytes), minimumBytes, throwOnEndOfStream: false);
 #else
         if (minimumBytes < 0 || buffer.Length < offset + minimumBytes)
             throw new ArgumentOutOfRangeException(nameof(minimumBytes));
-#endif
+
         int totalRead = 0;
         while (totalRead < minimumBytes)
         {
@@ -24,5 +24,6 @@ internal static class StreamExtensions
         }
 
         return totalRead;
+#endif
     }
 }
