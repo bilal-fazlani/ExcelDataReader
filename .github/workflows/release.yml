@@ -13,10 +13,10 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.x'
 
@@ -46,7 +46,7 @@ jobs:
         run: dotnet test src/ExcelDataReader.Tests/ExcelDataReader.Tests.csproj --no-build -c Release
 
       - name: Upload packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: packages
           path: '**/*.nupkg'
@@ -59,9 +59,10 @@ jobs:
 
     steps:
       - name: Download packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: packages
+          path: packages
 
       - name: Create draft release
         env:
@@ -69,4 +70,4 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           if [[ "$TAG" == *-* ]]; then PRERELEASE="--prerelease"; else PRERELEASE=""; fi
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --generate-notes --title "$TAG" $PRERELEASE ./**/*.nupkg
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --generate-notes --title "$TAG" $PRERELEASE $(find packages -name '*.nupkg')
