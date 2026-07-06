@@ -1057,7 +1057,8 @@ public abstract class ExcelTestBase
         
         Assert.That(reader.FieldCount, Is.GreaterThanOrEqualTo(10));
     }
-
+    
+    [Test]
     public void Issue541_BuiltinFormat55IsDate()
     {
         using var reader = OpenReader("Issue541");
@@ -1065,6 +1066,7 @@ public abstract class ExcelTestBase
         Assert.That(reader.GetValue(0), Is.EqualTo(new DateTime(2021, 1, 15)));
     }
 
+    [Test]
     public void AsDataSetTestFillEmptyCellsInMergedRangeNotUseHeaderRow()
     {
         using IExcelDataReader excelReader = OpenReader("MergedCell");
