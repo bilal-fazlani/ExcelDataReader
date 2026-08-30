@@ -26,7 +26,11 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <IsAotCompatible Condition=" '$(TargetFramework)' == 'net8.0' ">true</IsAotCompatible>
+    <!-- IsAotCompatible is intentionally NOT set here: enabling it causes the SDK to implicitly
+         pin a Microsoft.NET.ILLink.Tasks PackageReference to the exact installed SDK patch version
+         in packages.lock.json, which breaks locked mode restore (RestoreLockedMode) whenever dev
+         machines and CI runners have different SDK patches (see https://github.com/dotnet/sdk/issues/38200).
+         Reliable, reproducible restores via lock files are prioritized over this trim-analyzer signal. -->
     <ContinuousIntegrationBuild Condition=" '$(CI)' == 'true' ">true</ContinuousIntegrationBuild>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
