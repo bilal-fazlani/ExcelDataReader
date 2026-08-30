@@ -207,18 +207,11 @@ public class ExcelBinaryReaderTest : ExcelTestBase
         Assert.That(dataSet.Tables[1].Rows[27][12], Is.EqualTo(78624.44));
     }
 
-    /// <summary>
-    /// Not fixed yet
-    /// The problem occurs with unseekable stream and logic related to minifat that uses seek
-    /// It should probably only use seek if it needs to go backwards, I think at the moment it uses seek all the time
-    /// which is probably not good for performance.
-    /// </summary>
     [Test]
-    [Ignore("Not fixed yet")]
     public void Issue1163911644_ForwardOnlyStream()
     {
         // Excel.Log.Log.InitializeWith<Log4NetLog>();
-        using var stream = Configuration.GetTestWorkbook("OpenOffice");
+        using var stream = Configuration.GetTestWorkbook("OpenOffice.xls");
         using var forwardStream = SeekErrorMemoryStream.CreateFromStream(stream);
         using IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(forwardStream);
         Assert.DoesNotThrow(() => excelReader.AsDataSet());
