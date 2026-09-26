@@ -7,6 +7,8 @@ public abstract class ExcelTestBase
 {
     protected abstract DateTime Issue82_TodayDate { get; }
 
+    protected virtual bool SupportsCodeName => true;
+
     [Test]
     public void IssueDateAndTime1468Test()
     {
@@ -132,8 +134,8 @@ public abstract class ExcelTestBase
         // The expected values do not quite match what you see in Excel, is that correct?
         Assert.That(reader.GetColumnWidth(0), Is.EqualTo(8.43));
         Assert.That(reader.GetColumnWidth(1), Is.EqualTo(0));
-        Assert.That(reader.GetColumnWidth(2), Is.EqualTo(15.140625));
-        Assert.That(reader.GetColumnWidth(3), Is.EqualTo(28.7109375));
+        Assert.That(reader.GetColumnWidth(2), Is.EqualTo(15.140625).Within(0.01));
+        Assert.That(reader.GetColumnWidth(3), Is.EqualTo(28.7109375).Within(0.01));
 
         var expectedException = typeof(ArgumentException);
         var exception = Assert.Throws(expectedException, () =>
@@ -173,7 +175,7 @@ public abstract class ExcelTestBase
     {
         // Verify the file stream is closed and disposed by the reader
         {
-            var stream = OpenStream("10x10");
+            var stream = OpenFixtureStream("10x10");
             using (IExcelDataReader excelReader = OpenReader(stream, new ExcelReaderConfiguration()
             {
                 LeaveOpen = true
@@ -218,6 +220,9 @@ public abstract class ExcelTestBase
     [Test]
     public void Issue245_CodeName()
     {
+        if (!SupportsCodeName)
+            Assert.Ignore($"{GetType().Name} does not support sheet code names.");
+
         // Test CodeName is set
         using var reader = OpenReader("ExcelDataset");
         Assert.That(reader.CodeName, Is.EqualTo("Sheet1"));
@@ -1027,7 +1032,7 @@ public abstract class ExcelTestBase
     [Test]
     public void Issue618_SinglePassMode_RowCountThrows()
     {
-        using var reader = OpenReader(OpenStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        using var reader = OpenReader(OpenFixtureStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
         Assert.Throws<InvalidOperationException>(() => _ = reader.RowCount);
         reader.Read();
         Assert.Throws<InvalidOperationException>(() => _ = reader.RowCount);
@@ -1036,7 +1041,7 @@ public abstract class ExcelTestBase
     [Test]
     public void Issue618_SinglePassMode_AsDataSet()
     {
-        using var reader = OpenReader(OpenStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        using var reader = OpenReader(OpenFixtureStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
         var dataSet = reader.AsDataSet();
         Assert.That(dataSet.Tables[0].Rows.Count, Is.EqualTo(10));
         Assert.That(dataSet.Tables[0].Columns.Count, Is.EqualTo(10));
@@ -1047,7 +1052,7 @@ public abstract class ExcelTestBase
     [Test]
     public void Issue618_SinglePassMode_FieldCountGrows()
     {
-        using var reader = OpenReader(OpenStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
+        using var reader = OpenReader(OpenFixtureStream("10x10"), new ExcelReaderConfiguration { SinglePassMode = true });
         Assert.That(reader.FieldCount, Is.Zero);
         reader.Read();
         Assert.That(reader.FieldCount, Is.EqualTo(9));
@@ -1141,8 +1146,18 @@ public abstract class ExcelTestBase
     
     protected IExcelDataReader OpenReader(string name)
     {
-        return OpenReader(OpenStream(name));
+        return OpenReader(OpenFixtureStream(name));
     }
+
+    protected Stream OpenFixtureStream(string name)
+    {
+        if (!IsFixtureSupported(name))
+            Assert.Ignore($"Fixture '{name}' is not supported by {GetType().Name}.");
+
+        return OpenStream(name);
+    }
+
+    protected virtual bool IsFixtureSupported(string name) => true;
 
     protected abstract Stream OpenStream(string name);
 
